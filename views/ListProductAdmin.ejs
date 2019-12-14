@@ -1,0 +1,57 @@
+
+        <table class="table table-data2">
+            <thead>
+                <tr>
+                    <th>
+                        <label class="au-checkbox">
+                            <input type="checkbox">
+                            <span class="au-checkmark"></span>
+                        </label>
+                    </th>
+                    <th>Category Name</th>
+                    <th>Product Name</th>
+                    <th>Brand</th>
+                    <th>Color</th>
+                    <th>Price</th>
+                    <th>Total View</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <%products.forEach(function(product){%>
+                    <tr class="tr-shadow">
+                            <td>
+                                <label class="au-checkbox">
+                                    <input type="checkbox">
+                                    <span class="au-checkmark"></span>
+                                </label>
+                            </td>
+                            <td><%=product.CategoryName%></td>
+                            <td>
+                                <%=product.ProductName%>
+                            </td>
+                            <td class="desc"><%=product.Brand%></td>
+                            <td><%=product.Color%></td>
+                            <td>
+                                <%=product.Price%>
+                            </td>
+                            <td><%=product.TotalView%></td>
+                            <td>
+                                <div class="table-data-feature">
+                                    <button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit" data-id="<%=product.ProductID%>" onclick="getFormEdit(this)">
+                                        <i class="zmdi zmdi-edit"></i>
+                                    </button>
+                                    <button class="item" data-toggle="modal" data-placement="top" title="" data-original-title="Delete" data-target="#mediumModalDelete" data-id="<%=product.ProductID%>" data-cate="<%=product.CategoryName%>" onclick="setPID(this)">
+                                        <i class="zmdi zmdi-delete"></i>
+                                    </button>
+                                    <button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Detail">
+                                        <i class="zmdi zmdi-more"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="spacer"></tr>
+                <%})%>                 
+            </tbody>
+        </table>
+    <!-- END DATA TABLE -->

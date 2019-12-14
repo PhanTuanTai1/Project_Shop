@@ -1,0 +1,21 @@
+{
+  "name": "nodejs-store",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon --inspect ./bin/www"
+  },
+  "dependencies": {
+    "async-linq": "^1.0.4",
+    "aws-sdk": "^2.549.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "formidable": "^1.2.1",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "nodemon": "^1.19.4",
+    "uuid": "^3.3.3"
+  }
+}

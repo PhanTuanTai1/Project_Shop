@@ -1,0 +1,115 @@
+<%if(QProduct > limit){%>
+    <%var i = 0%>
+    <%while(i != limit) { %>
+        <!-- Single Product Area -->
+        <div class="col-12 col-sm-6 col-md-12 col-xl-6">
+            <div class="single-product-wrapper">
+                <!-- Product Image -->
+                <div class="product-img">
+                    <img src="img/product-img/product2.jpg" alt="">
+                    <!-- Hover Thumb -->
+                    <img class="hover-img" src="img/product-img/product3.jpg" alt="">
+                </div>
+    
+                <!-- Product Description -->
+                <div class="product-description d-flex align-items-center justify-content-between">
+                    <!-- Product Meta Data -->
+                    <div class="product-meta-data">
+                        <div class="line"></div>
+                        <p class="product-price">$<%=products[i].Price%></p>
+                        <a href="/product/<%=products[i].ProductID%>">
+                            <h6><%=products[i].CategoryName%></h6>
+                        </a>
+                    </div>
+                    <!-- Ratings & Cart -->
+                    <div class="ratings-cart text-right">
+                        <div class="ratings">
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </div>
+                        <div class="cart">
+                            <a href="#" data-toggle="tooltip" data-placement="left" title="Add to Cart" value="<%=products[i].ProductID%>">
+                                <img src="img/core-img/cart.png" alt="">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%i++;%>
+    <%}%>
+<%}else{%>
+    <%products.forEach(function(product) { %>
+        <!-- Single Product Area -->
+        <div class="col-12 col-sm-6 col-md-12 col-xl-6">
+            <div class="single-product-wrapper">
+                <!-- Product Image -->
+                <div class="product-img">
+                    <img src="img/product-img/product2.jpg" alt="">
+                    <!-- Hover Thumb -->
+                    <img class="hover-img" src="img/product-img/product3.jpg" alt="">
+                </div>
+    
+                <!-- Product Description -->
+                <div class="product-description d-flex align-items-center justify-content-between">
+                    <!-- Product Meta Data -->
+                    <div class="product-meta-data">
+                        <div class="line"></div>
+                        <p class="product-price">$<%=product.Price%></p>
+                    </div>
+                    <!-- Ratings & Cart -->
+                    <div class="ratings-cart text-right">
+                        <div class="ratings">
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </div>
+                        <div class="cart">
+                            <a href="#" class="addtoCart" data-toggle="tooltip" data-placement="left" title="Add to Cart" value="<%=product.ProductID%>">
+                                <img src="img/core-img/cart.png" alt="">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <%})%>
+<%}%>
+<p>split</p>
+<div class="col-12">
+        <!-- Pagination -->
+        <nav aria-label="navigation">
+            <ul class="pagination justify-content-end mt-50" id="list-page">
+                    <%if(QProduct > limit){%>
+                        <%var page%>
+                        <%var index = limit-1%>
+                        <%var pid = products[index].ProductID%>
+                        <%var categoryName = products[index].CategoryName%>
+                        <%if(QProduct%limit == 0) page = QProduct/limit
+                        else page = QProduct/limit + 1%>                                        
+                        <%for(var i = 1;i<= page ;i++){%>
+                            <%if(i == 1){%>
+                                <li class="page-item active">
+                                        <a class="page-link" href="#" data-link-type="/shop/<%=categoryName%>" data-id="P<%=parseInt(pid.split('P')[1]) - limit%>" onclick="GetProductPage(this)"><%=i%></a>
+                                </li>
+                            <%}else if(i == 2){%>
+                                <li class="page-item">
+                                        <a class="page-link" href="#" data-link-type="/shop/<%=categoryName%>" data-id="P<%=parseInt(pid.split('P')[1])%>" onclick="GetProductPage(this)"><%=i%></a>
+                                </li>
+                            <%}else{%>
+                                <li class="page-item">
+                                        <a class="page-link" href="#" data-link-type="/shop/<%=categoryName%>" data-id="P<%=parseInt(pid.split('P')[1]) + limit* (i-2)%>" onclick="GetProductPage(this)"><%=i%></a>
+                                </li>
+                            <%}%>
+                        <%}%>
+                    <%}%>
+            </ul>
+        </nav>
+    </div>
+<p>split</p>
+        js/handle.js

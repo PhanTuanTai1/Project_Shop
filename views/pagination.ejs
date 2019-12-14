@@ -1,0 +1,27 @@
+<div class="col-12">
+        <!-- Pagination -->
+        <nav aria-label="navigation">
+                        <ul class="pagination justify-content-end mt-50" id="list-page">
+                                <%var page%>
+                                <%if(QProduct%limit == 0) page = QProduct/limit
+                                else page = QProduct/limit + 1%>        
+                                <%if(typeof(objLast) != "undefined"){%>
+                                    <%for(var i = 1;i<= page ;i++){%>
+                                        <%if(i == 1){%>
+                                            <li class="page-item active">
+                                                    <a class="page-link" href="#" data-link-type="/shop/<%=objLast.CategoryName%>" data-id="P<%=parseInt(objLast.ProductID.split('P')[1]) - limit%>" onclick="getProduct(this)"><%=i%></a>
+                                            </li>
+                                        <%}else if(i == 2){%>
+                                            <li class="page-item active">
+                                                    <a class="page-link" href="#" data-link-type="/shop/<%=objLast.CategoryName%>" data-id="P<%=parseInt(objLast.ProductID.split('P')[1])%>" onclick="getProduct(this)"><%=i%></a>
+                                            </li>
+                                        <%}else{%>
+                                            <li class="page-item active">
+                                                    <a class="page-link" href="#" data-link-type="/shop/<%=objLast.CategoryName%>" data-id="P<%=parseInt(objLast.ProductID.split('P')[1]) + limit* (i-2)%>" onclick="getProduct(this)"><%=i%></a>
+                                            </li>
+                                        <%}%>
+                                    <%}%>
+                                <%}%>
+                        </ul>
+        </nav>
+</div>

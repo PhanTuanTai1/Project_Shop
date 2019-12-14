@@ -1,0 +1,20 @@
+<h6 class="widget-title mb-30">Brands</h6>
+    <div class="widget-desc">
+        <%var brand_enter = []%>
+        <%brand.forEach(function(brand) { %>
+            <%if(brand_enter.length == 0){%> <!-- Single Form Check -->
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="<%=brand.Brand%>" id="<%=brand.Brand%>">
+                    <label class="form-check-label" for="<%=brand.Brand%>"><%=brand.Brand%></label>
+                </div>
+                <%brand_enter.push(brand.Brand)%>
+            <%}
+            else if(brand_enter.includes(brand.Brand) == false){%>
+                <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="<%=brand.Brand%>" id="<%=brand.Brand%>">
+                        <label class="form-check-label" for="<%=brand.Brand%>"><%=brand.Brand%></label>
+                </div>
+                <%brand_enter.push(brand.Brand)%>
+            <%}%>
+        <%})%>
+</div>

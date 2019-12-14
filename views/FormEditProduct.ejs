@@ -1,0 +1,70 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Add Product</strong>
+    </div>
+    <div class="card-body card-block">
+        <form action="/admin/EditProduct" method="post" class="form-horizontal" enctype="multipart/form-data" >
+            <input type="hidden" value="<%=product.ProductID%>" name="ProductID">
+            <div class="row form-group">
+                <div class="col col-md-3">
+                    <label for="product_name" class=" form-control-label">Product Name</label>
+                </div>
+                <div class="col-12 col-md-9">
+                    <input type="text" id="product_name" name="ProductName" placeholder="Enter product name" class="form-control" value="<%=product.ProductName%>">
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col col-md-3">
+                    <label for="brand" class=" form-control-label">Brand</label>
+                </div>
+                <div class="col-12 col-md-9">
+                    <input type="text" id="brand" name="Brand" placeholder="Enter brand" class="form-control" value="<%=product.Brand%>">
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="brand" class=" form-control-label">Price</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="price" name="Price" placeholder="Enter price" class="form-control" value="<%=product.Price%>">
+                        <span class="help-block"></span>
+                    </div>
+            </div>
+            <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="files" class=" form-control-label">Picture</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input id="files" type="file" class="form-control" name = "files"/>
+                        <span class="help-block"></span>
+                    </div>
+            </div>
+            <div class="row form-group">
+                <div class="col col-md-3">
+                    <label for="category" class=" form-control-label">Category</label>
+                </div>
+                <div class="col-12 col-md-9">
+                    <select class="form-control form-control-md" name="CategoryName" tabindex="-1" aria-hidden="true" id="Category">
+                            <%categorys.forEach(function(category,index){%>
+                                <%if(category.SortKey == product.CategoryName){%> 
+                                    <option selected="selected" value="<%=category.SortKey%>"><%=category.SortKey%></option>
+                                <%}else{%> 
+                                    <option value="<%=category.SortKey%>"><%=category.SortKey%></option>
+                                <%}%>
+                            <%})%>
+                    </select>
+                </div>
+            </div>
+            <div class="card-footer">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fa fa-dot-circle-o"></i> Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm">
+                        <i class="fa fa-ban"></i> Reset
+                    </button>
+                </div>
+        </form>
+    </div>     
+</div>
