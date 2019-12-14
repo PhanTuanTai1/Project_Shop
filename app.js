@@ -11,6 +11,8 @@ var authRouter = require('./routes/auth');
 var authMiddleware = require('./middleware/auth.middleware');
 var adminRouter = require('./routes/admin');
 
+var searchController = require('./controllers/search.controllers');
+
 var app = express();
 
 // view engine setup
@@ -34,6 +36,8 @@ app.use('/admin',adminRouter);
 app.use(function(req, res, next) {
   next(createError(404));
 });
+
+
 
 // error handler
 app.use(function(err, req, res, next) {

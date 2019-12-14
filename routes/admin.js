@@ -95,4 +95,5 @@ router.get('/ListProductQuantityAdmin/:category',function(req,res){
 router.post("/EditProductQuantity",function(req,res){
     adminController.UpdateQuantity(req,res);
 })
+
 module.exports = router;

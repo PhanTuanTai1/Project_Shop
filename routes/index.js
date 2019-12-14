@@ -6,7 +6,7 @@ var queryOthers = require('../controllers/queryOthers.controllers');
 var authMiddleware = require('../middleware/auth.middleware');
 var cartController = require('../controllers/cart.controllers');
 var shopController = require('../controllers/shop.controllers');
-
+var searchController = require('../controllers/search.controllers');
 //Việt add>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 var checkoutController = require('../controllers/checkout.controllers');
 var productController = require('../controllers/product.controllers');
@@ -224,4 +224,7 @@ router.get('/cart', async function (req, res) {
     }
 });
 
+router.get('/search/:searchString',(req,res) => {
+    searchController.search(req,res);
+});
 module.exports = router;
