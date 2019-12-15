@@ -113,6 +113,7 @@ module.exports.Index = async function Init(res) {
     let promiseArray = array.map(asyncFunction);
 
     Promise.all(promiseArray).then(result => {
+        console.log(JSON.stringify(result));
         res.render('index', { selected: 0, list_product: result });
     });
 } 

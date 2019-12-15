@@ -1,43 +1,62 @@
 
 
+<div class="products-catagories-area clearfix">
+    <div class="amado-pro-catagory clearfix">
+        <!-- Single Catagory -->
 
-    <% list_product.forEach(p => { %>
-         <!-- Single Product Area -->
-    <div class="col-12 col-sm-6 col-md-12 col-xl-6">
-        <div class="single-product-wrapper">
-            <!-- Product Image -->
-            <div class="product-img">
-                <img src="/img/product-img/product2.jpg" alt="">
-                <!-- Hover Thumb -->
-                <img class="hover-img" src="/img/product-img/product3.jpg" alt="">
-            </div>
-
-            <!-- Product Description -->
-            <div class="product-description d-flex align-items-center justify-content-between">
-                <!-- Product Meta Data -->
-                <div class="product-meta-data">
+        <% list_product.forEach(p => { %>
+        <div class="single-products-catagory clearfix">
+            <a href="/product?id=<%=p.ProductID%>">
+                <img src="img/bg-img/1.jpg" alt="">
+                <!-- Hover Content -->
+                <div class="hover-content">
                     <div class="line"></div>
-                    <p class="product-price">$<%=p.Price%></p>
-                    <a href="/product/<%=p.ProductID%>">
-                        <h6><%=p.ProductName%></h6>
-                    </a>
+                    <p>From $<%=p.price%></p>
+                    <h4><%=p.ProductName%></h4>
                 </div>
-                <!-- Ratings & Cart -->
-                <div class="ratings-cart text-right">
-                    <div class="ratings">
-                        <i class="fa fa-star" aria-hidden="true"></i>
-                        <i class="fa fa-star" aria-hidden="true"></i>
-                        <i class="fa fa-star" aria-hidden="true"></i>
-                        <i class="fa fa-star" aria-hidden="true"></i>
-                        <i class="fa fa-star" aria-hidden="true"></i>
-                    </div>
-                    <div class="cart">
-                        <a href="#" class="addtoCart" data-toggle="tooltip" data-placement="left" title="Add to Cart" value="P127">
-                            <img src="/img/core-img/cart.png" alt="">
-                        </a>
-                    </div>
-                </div>
-            </div>
+            </a>
         </div>
+        <%})%>
+
     </div>
-    <%})%>
+</div>
+<!--    <% list_product.forEach(p => { %>-->
+<!--         &lt;!&ndash; Single Product Area &ndash;&gt;-->
+<!--    <div class="col-12 col-sm-6 col-md-12 col-xl-6">-->
+<!--        <div class="single-product-wrapper">-->
+<!--            &lt;!&ndash; Product Image &ndash;&gt;-->
+<!--            <div class="product-img">-->
+<!--                <img src="/img/product-img/product2.jpg" alt="">-->
+<!--                &lt;!&ndash; Hover Thumb &ndash;&gt;-->
+<!--                <img class="hover-img" src="/img/product-img/product3.jpg" alt="">-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; Product Description &ndash;&gt;-->
+<!--            <div class="product-description d-flex align-items-center justify-content-between">-->
+<!--                &lt;!&ndash; Product Meta Data &ndash;&gt;-->
+<!--                <div class="product-meta-data">-->
+<!--                    <div class="line"></div>-->
+<!--                    <p class="product-price">$<%=p.Price%></p>-->
+<!--                    <a href="/product/<%=p.ProductID%>">-->
+<!--                        <h6><%=p.ProductName%></h6>-->
+<!--                    </a>-->
+<!--                </div>-->
+<!--                &lt;!&ndash; Ratings & Cart &ndash;&gt;-->
+<!--                <div class="ratings-cart text-right">-->
+<!--                    <div class="ratings">-->
+<!--                        <i class="fa fa-star" aria-hidden="true"></i>-->
+<!--                        <i class="fa fa-star" aria-hidden="true"></i>-->
+<!--                        <i class="fa fa-star" aria-hidden="true"></i>-->
+<!--                        <i class="fa fa-star" aria-hidden="true"></i>-->
+<!--                        <i class="fa fa-star" aria-hidden="true"></i>-->
+<!--                    </div>-->
+<!--                    <div class="cart">-->
+<!--                        <a href="#" class="addtoCart" data-toggle="tooltip" data-placement="left" title="Add to Cart" value="P127">-->
+<!--                            <img src="/img/core-img/cart.png" alt="">-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <%})%>-->

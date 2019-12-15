@@ -10,6 +10,7 @@ var searchController = require('../controllers/search.controllers');
 //Việt add>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 var checkoutController = require('../controllers/checkout.controllers');
 var productController = require('../controllers/product.controllers');
+var orderController = require('../controllers/OrderControl.Controller');
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json()
 //Việt add>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -111,8 +112,7 @@ router.post('/cart/All/:id', async function (req, res, next) {
         } catch (err) {
             res.status(400).send(err);
         }
-    }
-    else {
+    } else {
         res.status(400).send("Failed");
     }
 });
@@ -139,7 +139,7 @@ router.get('/checkout', authMiddleware.requiredAuth, async function (req, res, n
 router.post('/checkout', jsonParser, async function (req, res) {
     var info = req.body;
     var today = new Date();
-    var date = today.getDate() + '-' + (today.getMonth()+1) + '-' + today.getFullYear();
+    var date = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
     console.log(req.body);
     var userID = req.signedCookies.userID;
     var isValid = await cartController.checkUserIDValid(userID);
@@ -147,12 +147,12 @@ router.post('/checkout', jsonParser, async function (req, res) {
         var varies = await cartController.getCartID(userID);
         var name = await cartController.getProductName(varies);
         res.redirect('/');
-        var t = await checkoutController.completeOrder(userID, varies,name,info.TotalPrice,{
-            "FirstName" : info.FirstName,
-            "LaseName" : info.LaseName,
-            "Address" : info.Address,
-            "Phone" : info.Phone,
-            "DeliveryDate" : date,
+        var t = await checkoutController.completeOrder(userID, varies, name, info.TotalPrice, {
+            "FirstName": info.FirstName,
+            "LaseName": info.LaseName,
+            "Address": info.Address,
+            "Phone": info.Phone,
+            "DeliveryDate": date,
             "PaymentMethod": info.PaymentMethod
         });
         if (t)
@@ -216,6 +216,8 @@ router.get('/cart', async function (req, res) {
             for (var i = 0; i < cart.length; i++) {
                 let price = await cartController.getPriceProductByID(cart[i].ProductID);
                 cart[i].Price = price;
+                let p = await cartController.getProduct(cart[i].ProductID);
+                cart[i].ProductName = p.ProductName;
                 total += price * cart[i].Quantity;
                 if (i == cart.length - 1)
                     res.render('cart', {c: cart, total: total, selected: 3});
@@ -224,7 +226,45 @@ router.get('/cart', async function (req, res) {
     }
 });
 
-router.get('/search/:searchString',(req,res) => {
-    searchController.search(req,res);
+router.get('/OrderControl', async (req, res) => {
+    var userID = req.signedCookies.userID;
+    console.log(userID);
+    var ls = await orderController.getAllOrder(userID);
+    for (var i = 0; i < ls.length; i++) {
+        var cart = await cartController.getOrderDetailByOrderID(ls[i].Varies);
+        console.log(JSON.stringify(cart, null, '\t'));
+        let total = 0;
+        for (var a = 0; a < cart.length; a++) {
+            let price = await cartController.getPriceProductByID(cart[a].ProductID);
+            total += price * cart[a].Quantity;
+            if (a == cart.length - 1) {
+                ls[i].TotalPrice = total;
+            }
+        }
+        if (i == ls.length - 1) {
+            console.log(JSON.stringify(ls, null, '\t'));
+            res.render('OrderControl', {order: ls, selected: 3});
+        }
+    }
+});
+
+router.get('/OrderDetail', async (req, res) => {
+    var userID = req.signedCookies.userID;
+    var orderId = req.query.id;
+    var cart = await cartController.getOrderDetailByOrderID(orderId);
+    let total = 0;
+    for (var i = 0; i < cart.length; i++) {
+        let price = await cartController.getPriceProductByID(cart[i].ProductID);
+        cart[i].Price = price;
+        let p = await cartController.getProduct(cart[i].ProductID);
+        cart[i].ProductName = p.ProductName;
+        total += price * cart[i].Quantity;
+        if (i == cart.length - 1)
+            res.render('OrderDetail', {c: cart, total: total, selected: 3});
+    }
+});
+
+router.get('/search/:searchString', (req, res) => {
+    searchController.search(req, res);
 });
 module.exports = router;
