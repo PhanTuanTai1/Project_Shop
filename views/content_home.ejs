@@ -1,0 +1,15 @@
+<%list_product.forEach(function(p){%>
+    <div class="single-products-catagory clearfix">
+        <a href="/product?id=<%=p.ProductID%>">
+        <img src="img/bg-img/1.jpg" alt="">
+        
+        <div class="hover-content">
+        <div class="line"></div>
+        <p>$<%=p.Price%></p>
+        <h4><%=p.ProductName%></h4>
+        </div>
+        </a>
+    </div>
+<%})%>
+
+
