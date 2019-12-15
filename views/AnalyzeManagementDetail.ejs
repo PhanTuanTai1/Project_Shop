@@ -373,32 +373,60 @@
                     <div class="col-lg-12">
                         <!-- TOP CAMPAIGN-->
                         <div class="top-campaign">
-                            <h3 class="title-3 m-b-30">Analyze User</h3>
-<!--                            <select class="form-control mt-2 mb-5">-->
-<!--                                <option>asd</option>-->
-<!--                                <option>asd</option>-->
-<!--                            </select>-->
+                            <h3 class="title-3 m-b-30">Analyze Order ID : <%=order.Varies%></h3>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label>Name : <%=order.DetailInfo.FirstName%></label>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label>Phone : <%=order.DetailInfo.Phone%></label>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label>Address : <%=order.DetailInfo.Address%></label>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label>Order Title : <%=order.Title%></label>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label>Total Price : <%=order.TotalPrice%></label>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label>Ship Money : <%=order.ShipMoney%></label>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label>Payment Method : <%=order.DetailInfo.PaymentMethod%></label>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label>Delivery Date : <%=order.DetailInfo.DeliveryDate%></label>
+                                </div>
+                            </div>
                             <div>
                                 <table class="table">
                                     <thead>
                                     <tr>
-                                        <th>User ID</th>
+                                        <th></th>
                                         <th>Name</th>
-                                        <th>Total Order</th>
-                                        <th>Total Product</th>
-                                        <th>Total Price</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <%ls.forEach(function (item) { %>
+                                    <% c.forEach(p => { %>
                                     <tr>
-                                        <td><a href="\admin\AnalyzeManagementOrder?id=<%=item.UserID%>"><%=item.UserID%></a></td>
-                                        <td><%=item.Name%></td>
-                                        <td><%=item.Order%></td>
-                                        <td><%=item.Product%></td>
-                                        <td><%=item.Price%></td>
+                                        <td class="cart_product_img">
+                                            <a href="/product?id=<%=p.ProductID%>"><%=p.ProductID%></a>
+                                        </td>
+                                        <td>
+                                            <%=p.ProductName%>
+                                        </td>
+                                        <td>
+                                            <%=p.Price*p.Quantity%>
+                                        </td>
+                                        <td>
+                                            <%=p.Quantity%>
+                                        </td>
                                     </tr>
-                                    <% }) %>
+                                    <%})%>
                                     </tbody>
                                 </table>
                             </div>

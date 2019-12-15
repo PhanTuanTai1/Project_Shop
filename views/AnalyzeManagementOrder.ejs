@@ -373,31 +373,31 @@
                     <div class="col-lg-12">
                         <!-- TOP CAMPAIGN-->
                         <div class="top-campaign">
-                            <h3 class="title-3 m-b-30">Analyze User</h3>
-<!--                            <select class="form-control mt-2 mb-5">-->
-<!--                                <option>asd</option>-->
-<!--                                <option>asd</option>-->
-<!--                            </select>-->
+                            <h3 class="title-3 m-b-30">Analyze Order Of User ID: <%=uid%></h3>
+                            <!--                            <select class="form-control mt-2 mb-5">-->
+                            <!--                                <option>asd</option>-->
+                            <!--                                <option>asd</option>-->
+                            <!--                            </select>-->
                             <div>
                                 <table class="table">
                                     <thead>
                                     <tr>
-                                        <th>User ID</th>
-                                        <th>Name</th>
-                                        <th>Total Order</th>
-                                        <th>Total Product</th>
-                                        <th>Total Price</th>
+                                        <th>Order ID</th>
+                                        <th>Date</th>
+                                        <th>Title</th>
+                                        <th>Price</th>
+                                        <th>Status</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <%ls.forEach(function (item) { %>
-                                    <tr>
-                                        <td><a href="\admin\AnalyzeManagementOrder?id=<%=item.UserID%>"><%=item.UserID%></a></td>
-                                        <td><%=item.Name%></td>
-                                        <td><%=item.Order%></td>
-                                        <td><%=item.Product%></td>
-                                        <td><%=item.Price%></td>
-                                    </tr>
+                                    <% order.forEach(o => { %>
+                                        <tr>
+                                            <td><a href="AnalyzeManagementDetail?id=<%= o.Varies %>&uid=<%=uid%>"><%= o.Varies %></a></td>
+                                            <td><%=o.Date%></td>
+                                            <td><%=o.Title%></td>
+                                            <td><%=o.TotalPrice%></td>
+                                            <td><%=o.Status%></td>
+                                        </tr>
                                     <% }) %>
                                     </tbody>
                                 </table>

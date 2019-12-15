@@ -97,7 +97,7 @@
                             <tbody>
                             <% order.forEach(o => { %>
                             <tr>
-                                <td><%= o.Varies %></td>
+                                <td><a href="OrderDetail?id=<%= o.Varies %>"><%= o.Varies %></a></td>
                                 <td><%=o.Date%></td>
                                 <td><%=o.Title%></td>
                                 <td><%=o.TotalPrice%></td>
@@ -181,13 +181,7 @@
                                         <a class="nav-link" href="shop.html">Shop</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="product-details.html">Product</a>
-                                    </li>
-                                    <li class="nav-item">
                                         <a class="nav-link" href="cart.html">Cart</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="checkout.html">Checkout</a>
                                     </li>
                                 </ul>
                             </div>

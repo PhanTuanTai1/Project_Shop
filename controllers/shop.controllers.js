@@ -1,4 +1,5 @@
 var AWS = require("aws-sdk");
+var cartController = require('../controllers/cart.controllers');
 
 AWS.config.update({
     region: "us-west-2",
@@ -9,7 +10,7 @@ AWS.config.update({
 
 var docClient = new AWS.DynamoDB.DocumentClient();
 
-module.exports.getAllCategory = (res) => {
+module.exports.getAllCategory = (req,res) => {
     var paramsCategories = {
         TableName : "Others",
         ProjectionExpression: "SortKey",
@@ -38,13 +39,38 @@ module.exports.getAllCategory = (res) => {
             },
             Limit : 6
         };
-        docClient.query(paramsAllProductByCategory, function(err, data) {
+        docClient.query(paramsAllProductByCategory, async function (err, data) {
             if (err) {
                 console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
                 reject();
             } else {
                 console.log("Query succeeded.");
-                res.render('shop', { selected: 1,category : result,list_product : data.Items,brand:data.Items,objLast : data.LastEvaluatedKey,QProduct : data.Items.length,limit:6 });
+                //Viet them code kiem tra order
+                var quantity = 0;
+                try {
+                    var userID = req.signedCookies.userID;
+                    var isValid = await cartController.checkUserIDValid(userID);
+                    if (isValid) {
+                        quantity = await cartController.getQuantityByIdCart(userID);
+                    } else {
+                        var cart = JSON.parse(req.cookies.cart);
+                        quantity = await cartController.getQuantityByCookie(cart);
+                    }
+                }catch (e) {
+                    quantity = 0;
+                }
+                //Viet them code kiem tra order
+
+                res.render('shop', {
+                    selected: 1,
+                    category: result,
+                    list_product: data.Items,
+                    brand: data.Items,
+                    objLast: data.LastEvaluatedKey,
+                    QProduct: data.Items.length,
+                    limit: 6,
+                    quan:quantity
+                });
             }
         });
         

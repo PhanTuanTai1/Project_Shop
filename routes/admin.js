@@ -6,6 +6,8 @@ var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 var router = express.Router();
 var analyzeController = require('../controllers/analyze.controllers');
+var orderController = require('../controllers/OrderControl.Controller');
+var cartController = require('../controllers/cart.controllers');
 
 router.get('/', function (req, res) {
     res.render('admin', {page: ""});
@@ -83,8 +85,46 @@ router.get('/AnalyzeManagement', jsonParser, async function (req, res) {
     res.render('AnalyzeManagement', {page: "",ls : lsAnalyze});
 });
 
-router.post('/AnalyzeManagement', jsonParser, function (req, res) {
-    res.render('AnalyzeManagement', {page: ""});
+router.get('/AnalyzeManagementOrder', jsonParser, async function (req, res) {
+    var userID = req.query.id;
+    console.log(userID);
+    var ls = await orderController.getAllOrder(userID);
+    for (var i = 0; i < ls.length; i++) {
+        var cart = await cartController.getOrderDetailByOrderID(ls[i].Varies);
+        console.log(JSON.stringify(cart, null, '\t'));
+        let total = 0;
+        for (var a = 0; a < cart.length; a++) {
+            let price = await cartController.getPriceProductByID(cart[a].ProductID);
+            total += price * cart[a].Quantity;
+            if (a == cart.length - 1) {
+                ls[i].TotalPrice = total;
+            }
+        }
+        if (i == ls.length - 1) {
+            console.log(JSON.stringify(ls, null, '\t'));
+            res.render('AnalyzeManagementOrder', {order: ls,uid:userID});
+        }
+    }
+});
+
+router.get('/AnalyzeManagementDetail', jsonParser, async function (req, res) {
+    var userID = req.query.uid;
+    var orderId = req.query.id;
+    console.log(userID + "|" + orderId);
+    var order = await orderController.getOrder(userID, orderId);
+    console.log(JSON.stringify(order));
+    var cart = await cartController.getOrderDetailByOrderID(orderId);
+    let total = 0;
+    for (var i = 0; i < cart.length; i++) {
+        let price = await cartController.getPriceProductByID(cart[i].ProductID);
+        cart[i].Price = price;
+        let p = await cartController.getProduct(cart[i].ProductID);
+        cart[i].ProductName = p.ProductName;
+        console.log(JSON.stringify(cart,null,'\t'));
+        total += price * cart[i].Quantity;
+        if (i == cart.length - 1)
+            res.render('AnalyzeManagementDetail', {order: order, c: cart, total: total});
+    }
 });
 router.get('/ListProductQuantity/',function(req,res){
     adminController.ProductQuantityManagement(req,res);

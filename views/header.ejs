@@ -21,30 +21,27 @@
                 <li><a href="/shop">Shop</a></li>
             <%}%>
             <% if(selected == 2) {%>
-                <li class="active"><a href="/product">Product</a></li>
-            <%}else {%>
-                <li><a href="/product">Product</a></li>
-            <%}%>
-            <% if(selected == 3) {%>
                 <li class="active"><a href="/cart">Cart</a></li>
             <%}else {%>
                 <li><a href="/cart">Cart</a></li>
             <%}%>
-            <% if(selected == 4) {%>
-                <li class="active"><a href="/checkout">Checkout</a></li>
+            <% if(selected == 3) {%>
+                <li class="active"><a href="/OrderControl">Order Control</a></li>
             <%}else {%>
-                <li><a href="/checkout">Checkout</a></li>
-            <%}%>   
+                <li><a href="/OrderControl">Order Control</a></li>
+            <%}%>
         </ul>
     </nav>
     <!-- Button Group -->
     <div class="amado-btn-group mt-30 mb-100">
-        <a href="#" class="btn amado-btn mb-15">%Discount%</a>
-        <a href="#" class="btn amado-btn active">New this week</a>
+        <a href="/auth/login" class="btn amado-btn mb-15">Login</a>
+        <a href="/admin" class="btn amado-btn active">Admin</a>
     </div>
     <!-- Cart Menu -->
     <div class="cart-fav-search mb-100">
-        <a href="cart.html" class="cart-nav"><img src="/img/core-img/cart.png" alt=""> Cart <span>(0)</span></a>
+        <a href="/cart" class="cart-nav"><img src="/img/core-img/cart.png" alt=""> Cart <span<%if(quan>0){%>
+                                                                                            style="color: red;"
+            <%}%>>(<%=quan%>)</span></a>
         <a href="#" class="fav-nav"><img src="/img/core-img/favorites.png" alt=""> Favourite</a>
         <a href="#" class="search-nav"><img src="/img/core-img/search.png" alt=""> Search</a>
     </div>

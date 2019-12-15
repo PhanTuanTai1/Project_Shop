@@ -6,37 +6,35 @@ AWS.config.update({
     accessKeyId: "accessKeyId",
     secretAccessKey: "secretAccessKey",
     endpoint: "http://localhost:8000"
-  });
-  
+});
+
 var docClient = new AWS.DynamoDB.DocumentClient();
 
-module.exports.checkUserIDValid = function(userID) {
-    return new Promise((resolve,reject) => {
+module.exports.checkUserIDValid = function (userID) {
+    return new Promise((resolve, reject) => {
 
-        if(!userID) {
+        if (!userID) {
             return resolve(false);
         }
 
         var paramsUserInfo = {
-            TableName : "Users",
+            TableName: "Users",
             KeyConditionExpression: "UserID = :id AND Varies = :varies",
             ExpressionAttributeValues: {
                 ":id": userID,
-                ":varies" : userID
+                ":varies": userID
             }
         }
 
-        docClient.query(paramsUserInfo, function(err, data) {
+        docClient.query(paramsUserInfo, function (err, data) {
             if (err) {
                 return resolve(false);
             } else {
-                if(data.Items.length <= 0) {
+                if (data.Items.length <= 0) {
                     return resolve(false);
-                }
-                else if(data.Items.length > 1){
+                } else if (data.Items.length > 1) {
                     return resolve(false);
-                }
-                else {
+                } else {
                     return resolve(true);
                 }
             }
@@ -45,11 +43,11 @@ module.exports.checkUserIDValid = function(userID) {
 }
 
 module.exports.getCartID = (userID) => {
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         var paramsCartByCusID = {
-            TableName : "Users",
+            TableName: "Users",
             KeyConditionExpression: "UserID = :id",
-            ExpressionAttributeNames:{
+            ExpressionAttributeNames: {
                 "#st": "Status"
             },
             FilterExpression: "#st = :status",
@@ -58,29 +56,28 @@ module.exports.getCartID = (userID) => {
                 ":status": "isCart"
             }
         }
-        docClient.query(paramsCartByCusID, async function(err, data) {
+        docClient.query(paramsCartByCusID, async function (err, data) {
             if (err) {
                 return reject(err);
             } else {
-                if(data.Items.length<=0) {
+                if (data.Items.length <= 0) {
                     var orderID = await createNewOrder(userID);
                     return resolve(orderID);
-                }
-                else {
+                } else {
                     var orderID = data.Items[0].Varies;
                     return resolve(orderID);
-                } 
+                }
             }
         });
     })
 }
 
 function createNewOrder(userID) {
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         var variesID = uuid.v4();
 
         var today = new Date();
-        var date = today.getDate() + '-' + (today.getMonth()+1) + '-' + today.getFullYear();
+        var date = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
         var dateTime = date + ' ' + time;
 
@@ -91,14 +88,14 @@ function createNewOrder(userID) {
                 "Varies": variesID,
                 "Title": "NULL",
                 "Status": "isCart",
-                "TotalPrice" : 0,
-                "Date" : dateTime,
+                "TotalPrice": 0,
+                "Date": dateTime,
                 "ShipMoney": 0,
-                "DetailInfo" : {}
+                "DetailInfo": {}
             }
         };
-        
-        docClient.put(params, function(err, data) {
+
+        docClient.put(params, function (err, data) {
             if (err) {
                 console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
 
@@ -114,67 +111,66 @@ function createNewOrder(userID) {
 }
 
 module.exports.addProductToOrder = (orderID, productID, num = 1) => {
-    return new Promise(async (resolve,reject) => {
+    return new Promise(async (resolve, reject) => {
         var product = await getProductByID(productID);
 
-        if(!product) return reject("Not found product");
+        if (!product) return reject("Not found product");
 
-        var orderDetail = await getOrderDetailByOrderIDAndProductID(orderID,productID);
-        if(orderDetail == null) {
-            var added = await addNewOrderDetail(orderID,product,num);
+        var orderDetail = await getOrderDetailByOrderIDAndProductID(orderID, productID);
+        if (orderDetail == null) {
+            var added = await addNewOrderDetail(orderID, product, num);
 
-            if(added) console.log('added new order'); 
-        }
-        else {
-            var edited = await setQuantityOfProductInOrder(orderID,productID,num);
+            if (added) console.log('added new order');
+        } else {
+            var edited = await setQuantityOfProductInOrder(orderID, productID, num);
 
-            if(edited) console.log('edited order');
+            if (edited) console.log('edited order');
         }
     });
 }
 
-function addNewOrderDetail(orderID,product,num) {
+function addNewOrderDetail(orderID, product, num) {
 
     console.log(product);
 
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         var params = {
             TableName: "Orders",
             Item: {
-                "OrderID" : orderID,
-                "ProductID" : product.ProductID,
-                "Quantity" : num,
-                "Price" : product.price
+                "OrderID": orderID,
+                "ProductID": product.ProductID,
+                "Quantity": num,
+                "Price": product.price
             }
         };
-    
-        docClient.put(params, function(err, data) {
-           if (err) {
-               console.log(JSON.stringify(err));
-           } else {
-               return resolve(true);
 
-           }
+        docClient.put(params, function (err, data) {
+            if (err) {
+                console.log(JSON.stringify(err));
+            } else {
+                return resolve(true);
+
+            }
         });
     })
 }
 
-function setQuantityOfProductInOrder(orderID,productID,quantity) {
-    return new Promise((resolve,reject) => {
+function setQuantityOfProductInOrder(orderID, productID, quantity) {
+    return new Promise((resolve, reject) => {
         var params = {
             TableName: "Orders",
-            Key:{
+            Key: {
                 "OrderID": orderID,
                 "ProductID": productID
             },
             UpdateExpression: "set Quantity = Quantity + :q",
-            ExpressionAttributeValues:{
+            ExpressionAttributeValues: {
                 ":q": quantity
             },
-            ReturnValues:"UPDATED_NEW"
+            ReturnValues: "UPDATED_NEW"
         };
 
-        docClient.update(params, function(err, data) {
+        docClient.update(params, function (err, data) {
             if (err) {
                 return resolve(false);
             } else {
@@ -184,10 +180,10 @@ function setQuantityOfProductInOrder(orderID,productID,quantity) {
     });
 }
 
-function getOrderDetailByOrderIDAndProductID(orderID,productID) {
-    return new Promise((resolve,reject) => {
+function getOrderDetailByOrderIDAndProductID(orderID, productID) {
+    return new Promise((resolve, reject) => {
         var paramsOrderDetail = {
-            TableName : "Orders",
+            TableName: "Orders",
             KeyConditionExpression: "OrderID = :orderID AND ProductID = :productID",
             ExpressionAttributeValues: {
                 ":orderID": orderID,
@@ -195,28 +191,28 @@ function getOrderDetailByOrderIDAndProductID(orderID,productID) {
             }
         };
 
-        docClient.query(paramsOrderDetail, function(err, data) {
+        docClient.query(paramsOrderDetail, function (err, data) {
             if (err) {
                 return reject("Unable to query. Error:", JSON.stringify(err, null, 2));
             } else {
-                return resolve(data.Items[0]);        
+                return resolve(data.Items[0]);
             }
         });
     });
 }
 
 function getProductByID(productID) {
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         var paramsProductID = {
-            TableName : "Products",
-            IndexName : "ProductIDIndex",
+            TableName: "Products",
+            IndexName: "ProductIDIndex",
             KeyConditionExpression: "ProductID = :productID",
             ExpressionAttributeValues: {
                 ":productID": productID
             }
         };
-        
-        docClient.query(paramsProductID, function(err, data) {
+
+        docClient.query(paramsProductID, function (err, data) {
             if (err) {
                 return reject(err);
             } else {
@@ -225,18 +221,19 @@ function getProductByID(productID) {
         });
     });
 }
+
 //================================================================================================================
 module.exports.getPriceProductByID = (id) => {
-    return new Promise( async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         var paramsProductID = {
-            TableName : "Products",
-            IndexName : "ProductIDIndex",
+            TableName: "Products",
+            IndexName: "ProductIDIndex",
             KeyConditionExpression: "ProductID = :productID",
             ExpressionAttributeValues: {
                 ":productID": id
             }
         };
-        docClient.query(paramsProductID, function(err, data) {
+        docClient.query(paramsProductID, function (err, data) {
             if (err) {
                 return reject(err);
             } else {
@@ -248,15 +245,15 @@ module.exports.getPriceProductByID = (id) => {
 }
 
 module.exports.getOrderDetailByOrderID = (orderID) => {
-    return new Promise( async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         var paramsOrderDetail = {
-            TableName : "Orders",
+            TableName: "Orders",
             KeyConditionExpression: "OrderID = :orderID",
             ExpressionAttributeValues: {
                 ":orderID": orderID
             }
         };
-        docClient.query(paramsOrderDetail, function(err, data) {
+        docClient.query(paramsOrderDetail, function (err, data) {
             if (err) {
                 return reject(err);
             } else {
@@ -267,16 +264,16 @@ module.exports.getOrderDetailByOrderID = (orderID) => {
 }
 
 module.exports.deleteOrderDetail = (orderID, productID) => {
-    return new Promise( async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         var params = {
-            TableName:"Orders",
-            Key:{
+            TableName: "Orders",
+            Key: {
                 "OrderID": orderID,
                 "ProductID": productID
             }
         };
 
-        docClient.delete(params, function(err, data) {
+        docClient.delete(params, function (err, data) {
             if (err) {
                 return reject(err);
             } else {
@@ -287,14 +284,14 @@ module.exports.deleteOrderDetail = (orderID, productID) => {
 }
 
 module.exports.setPriceToCart = (cart) => {
-    return new Promise( async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         var ls = cart;
-        for (var i = 0;i<ls.length;i++){
+        for (var i = 0; i < ls.length; i++) {
             console.log(ls[i].ProductID);
             let price = await getPriceProductByID(ls[i].ProductID);
             console.log(i);
             ls[i].Price = price;
-            if(i<ls-1){
+            if (i < ls - 1) {
                 console.log(ls);
                 return resolve(ls);
             }
@@ -303,17 +300,17 @@ module.exports.setPriceToCart = (cart) => {
 }
 
 module.exports.getProduct = (productID) => {
-    return new Promise( async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         var paramsProductID = {
-            TableName : "Products",
-            IndexName : "ProductIDIndex",
+            TableName: "Products",
+            IndexName: "ProductIDIndex",
             KeyConditionExpression: "ProductID = :productID",
             ExpressionAttributeValues: {
                 ":productID": productID
             }
         };
 
-        docClient.query(paramsProductID, function(err, data) {
+        docClient.query(paramsProductID, function (err, data) {
             if (err) {
                 return reject(err);
             } else {
@@ -324,28 +321,28 @@ module.exports.getProduct = (productID) => {
 }
 
 module.exports.getProductName = (orderID) => {
-    return new Promise( async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         var paramsOrderDetail = {
-            TableName : "Orders",
+            TableName: "Orders",
             KeyConditionExpression: "OrderID = :orderID",
             ExpressionAttributeValues: {
                 ":orderID": orderID
             }
         };
-        docClient.query(paramsOrderDetail, function(err, data1) {
+        docClient.query(paramsOrderDetail, function (err, data1) {
             if (err) {
                 return reject(err);
             } else {
                 var paramsProductID = {
-                    TableName : "Products",
-                    IndexName : "ProductIDIndex",
+                    TableName: "Products",
+                    IndexName: "ProductIDIndex",
                     KeyConditionExpression: "ProductID = :productID",
                     ExpressionAttributeValues: {
                         ":productID": data1.Items[0].ProductID
                     }
                 };
 
-                docClient.query(paramsProductID, function(err, data2) {
+                docClient.query(paramsProductID, function (err, data2) {
                     if (err) {
                         return reject(err);
                     } else {
@@ -355,5 +352,67 @@ module.exports.getProductName = (orderID) => {
             }
         });
 
+    })
+}
+
+module.exports.getQuantityByIdCart = (userID) => {
+    return new Promise(async (resolve, reject) => {
+        var paramsCartByCusID = {
+            TableName: "Users",
+            KeyConditionExpression: "UserID = :id",
+            ExpressionAttributeNames: {
+                "#st": "Status"
+            },
+            FilterExpression: "#st = :status",
+            ExpressionAttributeValues: {
+                ":id": userID,
+                ":status": "isCart"
+            }
+        }
+        docClient.query(paramsCartByCusID, async function (err, data) {
+            if (err) {
+                return reject(err);
+            } else {
+                if (data.Items.length <= 0) {
+                    return resolve(0);
+                } else {
+                    var orderID = data.Items[0].Varies;
+                    var paramsOrderDetail = {
+                        TableName: "Orders",
+                        KeyConditionExpression: "OrderID = :orderID",
+                        ExpressionAttributeValues: {
+                            ":orderID": orderID
+                        }
+                    };
+                    docClient.query(paramsOrderDetail, function (err, data2) {
+                        if (err) {
+                            return reject(err);
+                        } else {
+                            var quantity = 0;
+                            for (var i = 0; i < data2.Items.length; i++) {
+                                quantity += data2.Items[i].Quantity;
+                                if (i == data2.Items.length - 1) {
+                                    console.log("ppppppppppppppppppppppppppp SUCCESS " + quantity + data2.Items.length);
+                                    return resolve(quantity);
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    })
+}
+module.exports.getQuantityByCookie = (cart) => {
+    return new Promise(async (resolve, reject) => {
+        var quantity = 0;
+        for (var i = 0; i < cart.length; i++) {
+            quantity += cart[i].Quantity;
+            if (i == cart.length - 1){
+                console.log("ppppppppppppppppppppppppppp SUCCESS COOKIE")
+                return resolve(quantity);
+            }
+
+        }
     })
 }

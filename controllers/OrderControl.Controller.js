@@ -35,3 +35,23 @@ module.exports.getAllOrder = (id) => {
         });
     })
 }
+
+module.exports.getOrder = (id,varies) => {
+    return new Promise( async (resolve, reject) => {
+        var paramsAllOrderByCusID = {
+            TableName : "Users",
+            KeyConditionExpression: "UserID = :id AND Varies = :va",
+            ExpressionAttributeValues: {
+                ":id": id,
+                ":va": varies
+            }
+        }
+        docClient.query(paramsAllOrderByCusID, function(err, data) {
+            if (err) {
+                return reject(err);
+            } else {
+                return resolve(data.Items[0]);
+            }
+        });
+    })
+}

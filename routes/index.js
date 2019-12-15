@@ -16,13 +16,13 @@ var jsonParser = bodyParser.json()
 //Việt add>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
-    queryOthers.Index(res);
+router.get('/', async function (req, res, next) {
+    queryOthers.Index(req, res);
 });
 
 
 router.get('/shop', function (req, res, next) {
-    shopController.getAllCategory(res);
+    shopController.getAllCategory(req, res);
 });
 router.get('/shop/:category', function (req, res, next) {
     shopController.getProductByCategory(req, res);
@@ -129,9 +129,31 @@ router.get('/checkout', authMiddleware.requiredAuth, async function (req, res, n
         var customer = await checkoutController.getUser(userID);
         var orderID = await cartController.getCartID(userID);
         console.log(orderID)
-        var totalPrice = await checkoutController.getOrderTotalPrice(orderID)
+        var cart = await cartController.getOrderDetailByOrderID(orderID);
+        let total = 0;
+        for (var a = 0; a < cart.length; a++) {
+            let price = await cartController.getPriceProductByID(cart[a].ProductID);
+            total += price * cart[a].Quantity;
+            if (a == cart.length - 1) {
+                //Viet them code kiem tra order
+                var quantity = 0;
+                try {
+                    var userID = req.signedCookies.userID;
+                    var isValid = await cartController.checkUserIDValid(userID);
+                    if (isValid) {
+                        quantity = await cartController.getQuantityByIdCart(userID);
+                    } else {
+                        var cart = JSON.parse(req.cookies.cart);
+                        quantity = await cartController.getQuantityByCookie(cart);
+                    }
+                }catch (e) {
+                    quantity = 0;
+                }
+                //Viet them code kiem tra order
+                res.render('checkout', {cus: customer, total: total, selected: 4, quan: quantity});
+            }
+        }
 
-        res.render('checkout', {cus: customer, total: totalPrice, selected: 4});
     } else
         res.end("Error");
 });
@@ -146,6 +168,7 @@ router.post('/checkout', jsonParser, async function (req, res) {
     if (isValid) {
         var varies = await cartController.getCartID(userID);
         var name = await cartController.getProductName(varies);
+        console.log(info.TotalPrice);
         res.redirect('/');
         var t = await checkoutController.completeOrder(userID, varies, name, info.TotalPrice, {
             "FirstName": info.FirstName,
@@ -175,8 +198,22 @@ router.post('/register', jsonParser, function (req, res) {
 router.get('/product', async function (req, res, next) {
     var id = req.query.id;
     var p = await productController.getProductByID(id);
-
-    res.render('product', {p: p, selected: 2});
+    //Viet them code kiem tra order
+    var quantity = 0;
+    try {
+        var userID = req.signedCookies.userID;
+        var isValid = await cartController.checkUserIDValid(userID);
+        if (isValid) {
+            quantity = await cartController.getQuantityByIdCart(userID);
+        } else {
+            var cart = JSON.parse(req.cookies.cart);
+            quantity = await cartController.getQuantityByCookie(cart);
+        }
+    }catch (e) {
+        quantity = 0;
+    }
+    //Viet them code kiem tra order
+    res.render('product', {p: p, selected: 2,quan:quantity});
 });
 
 
@@ -191,27 +228,42 @@ router.get('/cart', async function (req, res) {
             var cartId = await cartController.getCartID(userID);
             cart = await cartController.getOrderDetailByOrderID(cartId);
             if (cart.length == 0) {
-                res.render('cart', {c: [], total: 0, selected: 3})
+                res.render('cart', {c: [], total: 0, selected: 2,quan:0})
             } else {
                 for (var i = 0; i < cart.length; i++) {
                     let p = await cartController.getProduct(cart[i].ProductID);
                     cart[i].ProductName = p.ProductName;
                     total += cart[i].Price * cart[i].Quantity;
                     if (i == cart.length - 1) {
-                        res.render('cart', {c: cart, total: total, selected: 3})
+                        //Viet them code kiem tra order
+                        var quantity = 0;
+                        try {
+                            var userID = req.signedCookies.userID;
+                            var isValid = await cartController.checkUserIDValid(userID);
+                            if (isValid) {
+                                quantity = await cartController.getQuantityByIdCart(userID);
+                            } else {
+                                var cart = JSON.parse(req.cookies.cart);
+                                quantity = await cartController.getQuantityByCookie(cart);
+                            }
+                        }catch (e) {
+                            quantity = 0;
+                        }
+                        //Viet them code kiem tra order
+                        res.render('cart', {c: cart, total: total, selected: 2, quan: quantity})
                     }
                 }
             }
         } else
-            res.render('cart', {c: [], total: 0, selected: 3});
+            res.render('cart', {c: [], total: 0, selected: 2,quan:0});
     } else {
         try {
             cart = JSON.parse(req.cookies.cart);
         } catch (e) {
-            res.render('cart', {c: [], total: 0, selected: 3});
+            res.render('cart', {c: [], total: 0, selected: 2,quan:0});
         }
         if (cart.length == 0)
-            res.render('cart', {c: [], total: 0, selected: 3});
+            res.render('cart', {c: [], total: 0, selected: 2,quan:0});
         else {
             for (var i = 0; i < cart.length; i++) {
                 let price = await cartController.getPriceProductByID(cart[i].ProductID);
@@ -219,14 +271,31 @@ router.get('/cart', async function (req, res) {
                 let p = await cartController.getProduct(cart[i].ProductID);
                 cart[i].ProductName = p.ProductName;
                 total += price * cart[i].Quantity;
-                if (i == cart.length - 1)
-                    res.render('cart', {c: cart, total: total, selected: 3});
+                if (i == cart.length - 1) {
+                    //Viet them code kiem tra order
+                    var quantity = 0;
+                    try {
+                        var userID = req.signedCookies.userID;
+                        var isValid = await cartController.checkUserIDValid(userID);
+                        if (isValid) {
+                            quantity = await cartController.getQuantityByIdCart(userID);
+                        } else {
+                            var cart = JSON.parse(req.cookies.cart);
+                            quantity = await cartController.getQuantityByCookie(cart);
+                        }
+                    }catch (e) {
+                        quantity = 0;
+                    }
+                    //Viet them code kiem tra order
+                    res.render('cart', {c: cart, total: total, selected: 2, quan: quantity});
+                }
+
             }
         }
     }
 });
 
-router.get('/OrderControl', async (req, res) => {
+router.get('/OrderControl', authMiddleware.requiredAuth, async (req, res) => {
     var userID = req.signedCookies.userID;
     console.log(userID);
     var ls = await orderController.getAllOrder(userID);
@@ -243,7 +312,22 @@ router.get('/OrderControl', async (req, res) => {
         }
         if (i == ls.length - 1) {
             console.log(JSON.stringify(ls, null, '\t'));
-            res.render('OrderControl', {order: ls, selected: 3});
+            //Viet them code kiem tra order
+            var quantity = 0;
+            try {
+                var userID = req.signedCookies.userID;
+                var isValid = await cartController.checkUserIDValid(userID);
+                if (isValid) {
+                    quantity = await cartController.getQuantityByIdCart(userID);
+                } else {
+                    var cart = JSON.parse(req.cookies.cart);
+                    quantity = await cartController.getQuantityByCookie(cart);
+                }
+            }catch (e) {
+                quantity = 0;
+            }
+            //Viet them code kiem tra order
+            res.render('OrderControl', {order: ls, selected: 3, quan: quantity});
         }
     }
 });
@@ -251,6 +335,8 @@ router.get('/OrderControl', async (req, res) => {
 router.get('/OrderDetail', async (req, res) => {
     var userID = req.signedCookies.userID;
     var orderId = req.query.id;
+    var order = await orderController.getOrder(userID, orderId);
+    console.log(JSON.stringify(order));
     var cart = await cartController.getOrderDetailByOrderID(orderId);
     let total = 0;
     for (var i = 0; i < cart.length; i++) {
@@ -260,7 +346,22 @@ router.get('/OrderDetail', async (req, res) => {
         cart[i].ProductName = p.ProductName;
         total += price * cart[i].Quantity;
         if (i == cart.length - 1)
-            res.render('OrderDetail', {c: cart, total: total, selected: 3});
+        //Viet them code kiem tra order
+            var quantity = 0;
+        try {
+            var userID = req.signedCookies.userID;
+            var isValid = await cartController.checkUserIDValid(userID);
+            if (isValid) {
+                quantity = await cartController.getQuantityByIdCart(userID);
+            } else {
+                var cart = JSON.parse(req.cookies.cart);
+                quantity = await cartController.getQuantityByCookie(cart);
+            }
+        }catch (e) {
+            quantity = 0;
+        }
+        //Viet them code kiem tra order
+        res.render('OrderDetail', {order: order, c: cart, total: total, selected: 3, quan: quantity});
     }
 });
 
