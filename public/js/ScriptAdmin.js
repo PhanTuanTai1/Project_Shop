@@ -109,10 +109,17 @@ $(document).on("click", ".open-AddBookDialog", function () {
     var myBookId = $(this).data('id');
     $(".modal-body #bookId").val( myBookId );
 
-    alert(myBookId);
-    // As pointed out in comments, 
-    // it is unnecessary to have to manually call the modal.
-    // $('#addBookDialog').modal('show');
+    
+   // alert(myBookId);
+    var orderID = myBookId.split(';')[0];
+    var userID = myBookId.split(';')[1];
+
+    $.ajax({
+        url: "/admin/ConfirmDetail?uid=" + userID + "&oid=" + orderID ,
+        method: 'GET'
+    }).then(function (res) {
+        $('#replaceMe').html(res);
+    })
 });
 
 function UpdateQuantity(obj){

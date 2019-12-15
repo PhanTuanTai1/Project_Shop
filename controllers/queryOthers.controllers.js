@@ -107,30 +107,13 @@ function asyncFunction(item) {
 }
 
 module.exports.Index = async function Init(req,res) {
-
-    //Viet them code kiem tra order
-    var quantity = 0;
-    try {
-        var userID = req.signedCookies.userID;
-        var isValid = await cartController.checkUserIDValid(userID);
-        if (isValid) {
-            quantity = await cartController.getQuantityByIdCart(userID);
-        } else {
-            var cart = JSON.parse(req.cookies.cart);
-            quantity = await cartController.getQuantityByCookie(cart);
-        }
-    }catch (e) {
-        quantity = 0;
-    }
-    //Viet them code kiem tra order
-
     var array = await getListProductID();
     // foreach productID to get all
     let promiseArray = array.map(asyncFunction);
 
     Promise.all(promiseArray).then(result => {
         console.log(JSON.stringify(result));
-        res.render('index', { selected: 0, list_product: result,quan:quantity });
+        res.render('index', { selected: 0, list_product: result });
     });
 } 
 

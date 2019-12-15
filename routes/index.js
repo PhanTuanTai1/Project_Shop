@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var AWS = require("aws-sdk");
+var shortid = require('shortid');
 
 var queryOthers = require('../controllers/queryOthers.controllers');
 var authMiddleware = require('../middleware/auth.middleware');
@@ -14,6 +15,15 @@ var orderController = require('../controllers/OrderControl.Controller');
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json()
 //Việt add>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+AWS.config.update({
+    region: "us-west-2",
+    accessKeyId: "accessKeyId",
+    secretAccessKey: "secretAccessKey",
+    endpoint: "http://localhost:8000"
+});
+
+var docClient = new AWS.DynamoDB.DocumentClient();
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
@@ -121,7 +131,7 @@ router.post('/cart/All/:id', async function (req, res, next) {
 //http://localhost:3000/checkout?id=123456
 router.get('/checkout', authMiddleware.requiredAuth, async function (req, res, next) {
     var userID = req.signedCookies.userID;
-//  console.log(cart);
+    //  console.log(cart);
 
     var isValid = await cartController.checkUserIDValid(userID);
 
@@ -135,25 +145,9 @@ router.get('/checkout', authMiddleware.requiredAuth, async function (req, res, n
             let price = await cartController.getPriceProductByID(cart[a].ProductID);
             total += price * cart[a].Quantity;
             if (a == cart.length - 1) {
-                //Viet them code kiem tra order
-                var quantity = 0;
-                try {
-                    var userID = req.signedCookies.userID;
-                    var isValid = await cartController.checkUserIDValid(userID);
-                    if (isValid) {
-                        quantity = await cartController.getQuantityByIdCart(userID);
-                    } else {
-                        var cart = JSON.parse(req.cookies.cart);
-                        quantity = await cartController.getQuantityByCookie(cart);
-                    }
-                }catch (e) {
-                    quantity = 0;
-                }
-                //Viet them code kiem tra order
-                res.render('checkout', {cus: customer, total: total, selected: 4, quan: quantity});
+                res.render('checkout', { cus: customer, total: total, selected: 4 });
             }
         }
-
     } else
         res.end("Error");
 });
@@ -169,7 +163,7 @@ router.post('/checkout', jsonParser, async function (req, res) {
         var varies = await cartController.getCartID(userID);
         var name = await cartController.getProductName(varies);
         console.log(info.TotalPrice);
-        res.redirect('/');
+        res.redirect('OrderControl');
         var t = await checkoutController.completeOrder(userID, varies, name, info.TotalPrice, {
             "FirstName": info.FirstName,
             "LaseName": info.LaseName,
@@ -179,7 +173,7 @@ router.post('/checkout', jsonParser, async function (req, res) {
             "PaymentMethod": info.PaymentMethod
         });
         if (t)
-            res.redirect('/');
+            res.redirect('OrderControl');
         else
             res.end("Error");
     } else {
@@ -188,7 +182,7 @@ router.post('/checkout', jsonParser, async function (req, res) {
 })
 
 router.get('/register', jsonParser, function (req, res) {
-    res.render('register', {selected: 2});
+    res.render('register', { selected: 2 });
 })
 
 router.post('/register', jsonParser, function (req, res) {
@@ -198,22 +192,7 @@ router.post('/register', jsonParser, function (req, res) {
 router.get('/product', async function (req, res, next) {
     var id = req.query.id;
     var p = await productController.getProductByID(id);
-    //Viet them code kiem tra order
-    var quantity = 0;
-    try {
-        var userID = req.signedCookies.userID;
-        var isValid = await cartController.checkUserIDValid(userID);
-        if (isValid) {
-            quantity = await cartController.getQuantityByIdCart(userID);
-        } else {
-            var cart = JSON.parse(req.cookies.cart);
-            quantity = await cartController.getQuantityByCookie(cart);
-        }
-    }catch (e) {
-        quantity = 0;
-    }
-    //Viet them code kiem tra order
-    res.render('product', {p: p, selected: 2,quan:quantity});
+    res.render('product', { p: p, selected: 2 });
 });
 
 
@@ -228,66 +207,40 @@ router.get('/cart', async function (req, res) {
             var cartId = await cartController.getCartID(userID);
             cart = await cartController.getOrderDetailByOrderID(cartId);
             if (cart.length == 0) {
-                res.render('cart', {c: [], total: 0, selected: 2,quan:0})
+                res.render('cart', { c: [], total: 0, selected: 2 })
             } else {
                 for (var i = 0; i < cart.length; i++) {
                     let p = await cartController.getProduct(cart[i].ProductID);
                     cart[i].ProductName = p.ProductName;
                     total += cart[i].Price * cart[i].Quantity;
                     if (i == cart.length - 1) {
-                        //Viet them code kiem tra order
-                        var quantity = 0;
-                        try {
-                            var userID = req.signedCookies.userID;
-                            var isValid = await cartController.checkUserIDValid(userID);
-                            if (isValid) {
-                                quantity = await cartController.getQuantityByIdCart(userID);
-                            } else {
-                                var cart = JSON.parse(req.cookies.cart);
-                                quantity = await cartController.getQuantityByCookie(cart);
-                            }
-                        }catch (e) {
-                            quantity = 0;
-                        }
-                        //Viet them code kiem tra order
-                        res.render('cart', {c: cart, total: total, selected: 2, quan: quantity})
+                        res.render('cart', { c: cart, total: total, selected: 2 })
                     }
                 }
             }
         } else
-            res.render('cart', {c: [], total: 0, selected: 2,quan:0});
+            res.render('cart', { c: [], total: 0, selected: 2 });
     } else {
         try {
             cart = JSON.parse(req.cookies.cart);
         } catch (e) {
-            res.render('cart', {c: [], total: 0, selected: 2,quan:0});
+            res.render('cart', { c: [], total: 0, selected: 2 });
         }
         if (cart.length == 0)
-            res.render('cart', {c: [], total: 0, selected: 2,quan:0});
+            res.render('cart', { c: [], total: 0, selected: 2 });
         else {
+            let ls = [];
             for (var i = 0; i < cart.length; i++) {
                 let price = await cartController.getPriceProductByID(cart[i].ProductID);
                 cart[i].Price = price;
+                console.log("Price.................................." + cart[i].price + price);
                 let p = await cartController.getProduct(cart[i].ProductID);
                 cart[i].ProductName = p.ProductName;
                 total += price * cart[i].Quantity;
+
                 if (i == cart.length - 1) {
-                    //Viet them code kiem tra order
-                    var quantity = 0;
-                    try {
-                        var userID = req.signedCookies.userID;
-                        var isValid = await cartController.checkUserIDValid(userID);
-                        if (isValid) {
-                            quantity = await cartController.getQuantityByIdCart(userID);
-                        } else {
-                            var cart = JSON.parse(req.cookies.cart);
-                            quantity = await cartController.getQuantityByCookie(cart);
-                        }
-                    }catch (e) {
-                        quantity = 0;
-                    }
-                    //Viet them code kiem tra order
-                    res.render('cart', {c: cart, total: total, selected: 2, quan: quantity});
+
+                    res.render('cart', { c: cart, total: total, selected: 2 });
                 }
 
             }
@@ -312,22 +265,7 @@ router.get('/OrderControl', authMiddleware.requiredAuth, async (req, res) => {
         }
         if (i == ls.length - 1) {
             console.log(JSON.stringify(ls, null, '\t'));
-            //Viet them code kiem tra order
-            var quantity = 0;
-            try {
-                var userID = req.signedCookies.userID;
-                var isValid = await cartController.checkUserIDValid(userID);
-                if (isValid) {
-                    quantity = await cartController.getQuantityByIdCart(userID);
-                } else {
-                    var cart = JSON.parse(req.cookies.cart);
-                    quantity = await cartController.getQuantityByCookie(cart);
-                }
-            }catch (e) {
-                quantity = 0;
-            }
-            //Viet them code kiem tra order
-            res.render('OrderControl', {order: ls, selected: 3, quan: quantity});
+            res.render('OrderControl', { order: ls, selected: 3 });
         }
     }
 });
@@ -346,26 +284,131 @@ router.get('/OrderDetail', async (req, res) => {
         cart[i].ProductName = p.ProductName;
         total += price * cart[i].Quantity;
         if (i == cart.length - 1)
-        //Viet them code kiem tra order
-            var quantity = 0;
-        try {
-            var userID = req.signedCookies.userID;
-            var isValid = await cartController.checkUserIDValid(userID);
-            if (isValid) {
-                quantity = await cartController.getQuantityByIdCart(userID);
-            } else {
-                var cart = JSON.parse(req.cookies.cart);
-                quantity = await cartController.getQuantityByCookie(cart);
-            }
-        }catch (e) {
-            quantity = 0;
-        }
-        //Viet them code kiem tra order
-        res.render('OrderDetail', {order: order, c: cart, total: total, selected: 3, quan: quantity});
+            res.render('OrderDetail', { order: order, c: cart, total: total, selected: 3 });
     }
 });
+router.get('/UserInfomation', authMiddleware.requiredAuth, async function (req, res) {
+    var userID = req.signedCookies.userID;
+    var customer = await checkoutController.getUser(userID);
+    res.render('UserInfomation', { cus: customer, selected: 3 });
+})
+
+router.post('/UserInfomation', jsonParser, async function (req, res) {
+    var info = req.body;
+    console.log(info);
+    var userID = req.signedCookies.userID;
+    var isValid = await cartController.checkUserIDValid(userID);
+
+    if (isValid) {
+        var params = {
+            TableName: "Users",
+            Key: {
+                "UserID": userID,
+                "Varies": userID,
+            },
+            UpdateExpression: "set #em=:em,#fin=:fin,#lstn=:lstn,#con=:con,#ad=:ad,#ct=:ct,#zi=:zi,#ph=:ph,#fv=:fv",
+            ExpressionAttributeNames: {
+                "#em": "Email",
+                "#fin": "FirstName",
+                "#lstn": "LastName",
+                "#con": "Country",
+                "#ad": "Address",
+                "#ct": "City",
+                "#zi": "ZipCode",
+                "#ph": "Phone",
+                "#fv": "Favorite"
+            },
+            ExpressionAttributeValues: {
+                ":em": info.email,
+                ":fin": info.FirstName,
+                ":lstn": info.LastName,
+                ":con": info.country,
+                ":ad": info.Address,
+                ":ct": info.City,
+                ":zi": info.ZipCode,
+                ":ph": info.Phone,
+                ":fv": []
+            },
+            ReturnValues: "UPDATED_NEW"
+        };
+
+        docClient.update(params, function (err, data) {
+            if (err) {
+                console.log(JSON.stringify(err));
+            } else {
+                console.log("Update ok");
+                res.redirect('UserInfomation');
+            }
+        });
+    }
+
+})
 
 router.get('/search/:searchString', (req, res) => {
     searchController.search(req, res);
 });
+
+router.get('/cregister',(req,res) => {
+    res.render('register',{
+        error: ''
+    });
+})
+
+router.post('/cregister',(req,res) => {
+    
+    console.log(req.body.password + ' | ' + req.body.repassword);
+
+    if(req.body.password !== req.body.repassword){
+        res.render('register',{
+            error: 'Passsword and confirm password must be the same'
+        });
+    }
+
+    var paramsEmail = {
+        TableName : "Users",
+        IndexName: "EmailIndex",
+        KeyConditionExpression: "Email = :email",
+        ExpressionAttributeValues: {
+            ":email": req.body.email
+        }
+    };
+
+    docClient.query(paramsEmail,(err,data) => {
+        if(err)
+            res.render('register',{
+                error: "Cannot connect to serrver"
+            });
+        else {
+            if(data.Items.length > 0) 
+                res.render('register',{
+                    error: "Email used please choose another one"
+                });
+            else {
+                var userid = shortid.generate();
+
+                var params = {
+                    TableName:"Users",
+                    Item:{
+                        "UserID": userid,
+                        "Varies": userid,
+                        "Email": req.body.email,
+                        "Password" : req.body.password
+                    }
+                };
+                docClient.put(params,(err,data) => {
+                    if (err) {
+                        res.render('register',{
+                            error: "Email or password invalid"
+                        });
+                    } else {
+                        res.render('register',{
+                            error: "Created account"
+                        })
+                    }
+                })
+            }
+        }
+    })
+
+})
 module.exports = router;
