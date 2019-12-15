@@ -1,11 +1,17 @@
 var AWS = require("aws-sdk");
 
+// AWS.config.update({
+//     region: "us-west-2",
+//     accessKeyId: "accessKeyId",
+//     secretAccessKey: "secretAccessKey",
+//     endpoint: "http://localhost:8000"
+// });
 AWS.config.update({
     region: "us-west-2",
-    accessKeyId: "accessKeyId",
-    secretAccessKey: "secretAccessKey",
-    endpoint: "http://localhost:8000"
-});
+    accessKeyId: "AKIAIOWR4C2QRAMPFF4A",
+    secretAccessKey: "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",
+    endpoint: "dynamodb.us-west-2.amazonaws.com"
+  });
 
 var merger = require('../middleware/merge');
 

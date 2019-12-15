@@ -395,12 +395,7 @@
         <table class="table table-data2">
             <thead>
                 <tr>
-                    <th>
-                        <label class="au-checkbox">
-                            <input type="checkbox">
-                            <span class="au-checkmark"></span>
-                        </label>
-                    </th>
+                    
                     <th>Category Name</th>
                     <th>Product Name</th>
                     <th>Brand</th>
@@ -412,12 +407,7 @@
             <tbody>
                 <%products.forEach(function(product){%>
                     <tr class="tr-shadow">
-                            <td>
-                                <label class="au-checkbox">
-                                    <input type="checkbox">
-                                    <span class="au-checkmark"></span>
-                                </label>
-                            </td>
+                            
                             <td><%=product.CategoryName%></td>
                             <td>
                                 <%=product.ProductName%>
@@ -434,7 +424,7 @@
                             <td>
                                 <div>
                                     <button  onclick="setPID(this)" class="btn btn-primary" data-id="<%=product.ProductID%>"  data-toggle="modal" data-original-title="Delete" data-target="#mediumModalUpdateQuantity">
-                                        <i class="zmdi zmdi-edit"></i>Update Quantity
+                                        <i class="zmdi zmdi-edit"></i> Update Quantity
                                     </button>                                
                                 </div>
                             </td>
@@ -446,13 +436,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="copyright">
-                                    <p>Copyright © 2018 Colorlib. All rights reserved. Template by <a href="https://colorlib.com">Colorlib</a>.</p>
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
             </div>

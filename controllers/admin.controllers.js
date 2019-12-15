@@ -2,15 +2,21 @@ var AWS = require("aws-sdk");
 var formidable = require("formidable");
 var fs = require("fs");
 
+// AWS.config.update({
+//     region: "us-west-2",
+//     accessKeyId: "accessKeyId",
+//     secretAccessKey: "secretAccessKey",
+//     endpoint: "http://localhost:8000"
+// });
 AWS.config.update({
     region: "us-west-2",
-    accessKeyId: "accessKeyId",
-    secretAccessKey: "secretAccessKey",
-    endpoint: "http://localhost:8000"
-});
+    accessKeyId: "AKIAIOWR4C2QRAMPFF4A",
+    secretAccessKey: "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",
+    endpoint: "dynamodb.us-west-2.amazonaws.com"
+  });
 
 var docClient = new AWS.DynamoDB.DocumentClient();
-
+// var upload = require("./upload.controller");
 module.exports.CategoryManagement = (res) => {
     ReturnCategoryList(res);
 };
@@ -188,38 +194,53 @@ module.exports.AddProduct = (req,res) => {
 function AddProduct(req,res,pid){
     let listName = [];
     let form = new formidable.IncomingForm();
-    form.uploadDir = "public/img/"
     form.parse(req, function(err, fields, files){
         if(err) console.log(err);
-        else {
-            let tmpPath = files.files.path;
-            let newPath = form.uploadDir + files.files.name;
-            fs.rename(tmpPath, newPath, (err) => {
-                if (err) console.log(err) ;
-                else {
-                    fs.readFile(newPath, (err, fileUploaded) => {
-                        if(err) console.log(err);
-                        console.log("Saved");
-                    });
-                }
-            });
-            var params = {
-                TableName : "Products",
-                Item : {
-                    "CategoryName" : fields.CategoryName,
-                    "ProductID" : pid,
-                    "ProductName" : fields.ProductName,
-                    "Brand" : fields.Brand,
-                    "Price" : fields.Price,
-                    "Picture" : files.files.name
-                }
-            }
-            docClient.put(params,function(err,data){
-                if(err) console.log(err);
-                else {
-                    ReturnListProduct(req,res);
-                }
+        else {         
+            let s3Bucket = new AWS.S3({
+                accessKeyId: "AKIAIOWR4C2QRAMPFF4A",
+                secretAccessKey: "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",
+                Bucket: "shopbucket123",
+                ACL: 'public-read',
+                endpoint: "https://s3.amazonaws.com"     
             })
+            s3Bucket.createBucket(function(){
+                let fileStream = fs.createReadStream(files.files.path);
+                fileStream.on('error', function(err) {
+                console.log('File Error', err);
+                });
+                var params = {
+                    Bucket: "shopbucket123",
+                    ACL: 'public-read',
+                    Key : files.files.name,
+                    Body : fileStream   
+                }
+                
+                s3Bucket.upload(params,function(err,data){
+                    if(err) console.log(err);
+                    else {
+                        var params = {
+                            TableName : "Products",
+                            Item : {
+                                "CategoryName" : fields.CategoryName,
+                                "ProductID" : pid,
+                                "ProductName" : fields.ProductName,
+                                "Brand" : fields.Brand,
+                                "Price" : fields.Price,
+                                "Color" : fields.Color,
+                                "Picture" : data.Location
+                            }
+                        }
+                        docClient.put(params,function(err,data){
+                            if(err) console.log(err);
+                            else {
+                                res.redirect("/admin/ProductManagement");
+                            }
+                        })
+                    }
+                })
+            });   
+            
         }
     })
 }
@@ -260,7 +281,7 @@ module.exports.ReturnFormEdit = (req,res) => {
 function EditProduct(req,res){
 
     let form = new formidable.IncomingForm();
-    form.uploadDir = "public/img/"
+    //form.uploadDir = "public/img/"
     form.parse(req, function(err, fields, files){
         if(err) console.log(err);
         else {
@@ -268,59 +289,82 @@ function EditProduct(req,res){
             console.log(fields.ProductID);
             console.log(fields.CategoryName);
             console.log(fields.Price);
-            let tmpPath = files.files.path;
-            let newPath = form.uploadDir + files.files.name;
-            fs.rename(tmpPath, newPath, (err) => {
-                if (err){
+            console.log(fields.Color);     
+                if (files.files.name == ""){
                     var params = {
                         TableName: "Products",
                         Key:{
                             "CategoryName": fields.CategoryName,
                             "ProductID": fields.ProductID
                         },
-                        UpdateExpression: "set Brand = :b, Price=:p,ProductName = :pn",
+                        UpdateExpression: "set Brand = :b, Price=:p,ProductName = :pn, Color = :c",
                         ExpressionAttributeValues:{
                             ":b":fields.Brand,
                             ":p": fields.Price,
-                            ":pn" : fields.ProductName
+                            ":pn" : fields.ProductName,
+                            ":c" : fields.Color,                           
                         },
                         ReturnValues:"UPDATED_NEW"
                     };
                     docClient.update(params,function(err,data){
                         if(err) console.log(err);
                         else {
-                            ReturnListProduct(req,res);
+                            res.redirect("/admin/ProductManagement");
                         }
                     })
                 }
                 else {
-                    fs.readFile(newPath, (err, fileUploaded) => {
-                    if(err) console.log(err);
-                    console.log("Saved");
-                    var params = {
-                        TableName: "Products",
-                        Key:{
-                            "CategoryName": fields.CategoryName,
-                            "ProductID": fields.ProductID
-                        },
-                        UpdateExpression: "set Brand = :b, Price=:p, Picture=:pt,ProductName = :pn",
-                        ExpressionAttributeValues:{
-                            ":b":fields.Brand,
-                            ":p": fields.Price,
-                            ":pt":files.files.name,
-                            ":pn" : fields.ProductName
-                        },
-                        ReturnValues:"UPDATED_NEW"
-                    };
-                    docClient.update(params,function(err,data){
-                        if(err) console.log(err);
-                        else {
-                            ReturnListProduct(req,res);
-                        }
+                    let s3Bucket = new AWS.S3({
+                        accessKeyId: "AKIAIOWR4C2QRAMPFF4A",
+                        secretAccessKey: "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",
+                        Bucket: "shopbucket123",
+                        ACL: 'public-read',
+                        endpoint: "https://s3.amazonaws.com"     
                     })
+                    s3Bucket.createBucket(function(){
+                        let fileStream = fs.createReadStream(files.files.path);
+                        fileStream.on('error', function(err) {
+                        console.log('File Error', err);
+                        });
+                        var params = {
+                            Bucket: "shopbucket123",
+                            ACL: 'public-read',
+                            Key : files.files.name,
+                            Body : fileStream,
+                            
+                        }
+                        
+                        s3Bucket.upload(params,function(err,data){
+                            if(err) console.log(err);
+                            else {
+                                var params = {
+                                    TableName: "Products",
+                                    Key:{
+                                        "CategoryName": fields.CategoryName,
+                                        "ProductID": fields.ProductID
+                                    },
+                                    UpdateExpression: "set Brand = :b, Price=:p, Picture = :pt,ProductName = :pn,Color = :c",
+                                    ExpressionAttributeValues:{
+                                        ":b":fields.Brand,
+                                        ":p": fields.Price,
+                                        ":pt":data.Location,
+                                        ":pn" : fields.ProductName,
+                                        ":c" : fields.Color
+                                    },
+                                    ReturnValues:"UPDATED_NEW"
+                                };
+                                docClient.update(params,function(err,data){
+                                    if(err) console.log(err);
+                                    else {
+                                        res.redirect("/admin/ProductManagement");
+                                    }
+                                })
+                            }
+                        });
+                   
                 });
             }
-            });
+           
         }
     })
 }
@@ -329,7 +373,7 @@ module.exports.EditProduct = (req,res) => {
 }
 module.exports.DeleteProduct = (req,res) => {
     console.log(req.query.category);
-    console.log(req.query.pid);
+    console.log(req.params.pid);
     var params = {
         TableName: "Products",
         Key:{

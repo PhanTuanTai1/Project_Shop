@@ -1,11 +1,17 @@
 var AWS = require("aws-sdk");
 
+// AWS.config.update({
+//     region: "us-west-2",
+//     accessKeyId: "accessKeyId",
+//     secretAccessKey: "secretAccessKey",
+//     endpoint: "http://localhost:8000"
+// });
 AWS.config.update({
     region: "us-west-2",
-    accessKeyId: "accessKeyId",
-    secretAccessKey: "secretAccessKey",
-    endpoint: "http://localhost:8000"
-});
+    accessKeyId: "AKIAIOWR4C2QRAMPFF4A",
+    secretAccessKey: "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",
+    endpoint: "dynamodb.us-west-2.amazonaws.com"
+  });
 
 var docClient = new AWS.DynamoDB.DocumentClient();
 
@@ -43,7 +49,7 @@ module.exports.search = (req,res) => {
                             reject();
                         } else {
                             if(data.Items.length > 0)
-                                res.render('shop', { selected: 1,category : [],list_product : data.Items,brand:data.Items,objLast : data.LastEvaluatedKey,QProduct : data.Items.length,limit:6 });
+                                res.render('shop', { selected: 1,category : [],list_product : data.Items,brand:[],objLast : data.LastEvaluatedKey,QProduct : data.Items.length,limit:6});
                         }
                     });
                 }

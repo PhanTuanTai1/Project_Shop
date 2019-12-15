@@ -137,3 +137,68 @@ function UpdateQuantity(obj){
         }
     })
 }
+
+function Check(obj){
+    if(obj.value.trim() == ""){
+        obj.setCustomValidity("Please enter this field"); 
+
+    }
+    else {
+        obj.setCustomValidity(""); 
+        if(obj.getAttribute("id") == "price") isNumber(obj);
+        return true; 
+    }
+}
+function isNumber(obj){
+    var patt1 = /^\d+(\.\d+)?$/;
+    if(patt1.test(obj.value.trim()) == true){
+        obj.setCustomValidity("");
+        //alert(patt1.test(obj.value.trim()));
+    }
+    else {
+        obj.setCustomValidity("Please enter number for this field");
+        //alert(patt1.test(obj.value.trim()));
+    }
+}
+function isFileImage(file) {
+    const acceptedImageTypes = ['gif', 'jpeg', 'png','jpg'];
+ 
+    for(var i = 0;i < acceptedImageTypes.length;i++){
+        if(file.value.split(acceptedImageTypes[i]).length > 1){          
+           return true; 
+      }
+    }
+    return false;
+}
+function change(obj){
+    var check = isFileImage(obj);
+    if(check == true){
+        obj.setCustomValidity("");  
+    }
+    else {
+        obj.setCustomValidity("Please choose another file");
+    }
+}
+function checkAll(obj){
+    var value = obj.getAttribute("data-value");
+    var productName = document.getElementById("product_name");
+    var brand = document.getElementById("brand");
+    var color = document.getElementById("color");
+    var price = document.getElementById("price");
+    var file = document.getElementById("files");
+    Check(productName);
+    Check(brand);
+    Check(color);
+    if(Check(price) == true){
+        isNumber(price);
+    }
+    //alert(value);
+    if(value == "add"){
+        if(Check(file) == true) {
+            //alert(file);
+            change(file);
+        }
+    }
+   
+    document.getElementById("btnSubmitAdd").click();
+}

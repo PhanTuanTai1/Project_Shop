@@ -1,13 +1,18 @@
 var AWS = require("aws-sdk");
 var linq = require('async-linq');
 
+// AWS.config.update({
+//     region: "us-west-2",
+//     accessKeyId: "accessKeyId",
+//     secretAccessKey: "secretAccessKey",
+//     endpoint: "http://localhost:8000"
+// });
 AWS.config.update({
     region: "us-west-2",
-    accessKeyId: "accessKeyId",
-    secretAccessKey: "secretAccessKey",
-    endpoint: "http://localhost:8000"
-});
-
+    accessKeyId: "AKIAIOWR4C2QRAMPFF4A",
+    secretAccessKey: "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",
+    endpoint: "dynamodb.us-west-2.amazonaws.com"
+  });
 var docClient = new AWS.DynamoDB.DocumentClient();
 
 module.exports.getAllUser = () => {

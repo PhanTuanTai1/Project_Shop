@@ -105,3 +105,10 @@ function setActivePage(obj){
     page_active.classList.remove("active");
     obj.parentElement.classList.add("active");
 }
+function Search(event){
+    if(event.which == 13){
+        event.preventDefault();
+        var link = "/search/" + document.getElementById("search_custom").value;
+        window.location.replace(link);
+    }
+}

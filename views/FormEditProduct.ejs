@@ -1,16 +1,16 @@
 <div class="card">
     <div class="card-header">
-        <strong>Add Product</strong>
+        <strong>Edit Product</strong>
     </div>
     <div class="card-body card-block">
-        <form action="/admin/EditProduct" method="post" class="form-horizontal" enctype="multipart/form-data" >
+        <form action="/admin/EditProduct" method="post" class="form-horizontal" enctype="multipart/form-data">
             <input type="hidden" value="<%=product.ProductID%>" name="ProductID">
             <div class="row form-group">
                 <div class="col col-md-3">
                     <label for="product_name" class=" form-control-label">Product Name</label>
                 </div>
                 <div class="col-12 col-md-9">
-                    <input type="text" id="product_name" name="ProductName" placeholder="Enter product name" class="form-control" value="<%=product.ProductName%>">
+                    <input type="text" id="product_name" name="ProductName" placeholder="Enter product name" class="form-control" value="<%=product.ProductName%>" onkeyup="Check(this)">
                     <span class="help-block"></span>
                 </div>
             </div>
@@ -19,7 +19,7 @@
                     <label for="brand" class=" form-control-label">Brand</label>
                 </div>
                 <div class="col-12 col-md-9">
-                    <input type="text" id="brand" name="Brand" placeholder="Enter brand" class="form-control" value="<%=product.Brand%>">
+                    <input type="text" id="brand" name="Brand" placeholder="Enter brand" class="form-control" value="<%=product.Brand%>" onkeyup="Check(this)">
                     <span class="help-block"></span>
                 </div>
             </div>
@@ -28,7 +28,16 @@
                         <label for="brand" class=" form-control-label">Price</label>
                     </div>
                     <div class="col-12 col-md-9">
-                        <input type="text" id="price" name="Price" placeholder="Enter price" class="form-control" value="<%=product.Price%>">
+                        <input type="text" id="price" name="Price" placeholder="Enter price" class="form-control" value="<%=product.Price%>" type="number" onkeyup="Check(this)">
+                        <span class="help-block"></span>
+                    </div>
+            </div>
+            <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="brand" class=" form-control-label">Color</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="color" name="Color" placeholder="Enter color" class="form-control" value="<%=product.Color%>" onkeyup="Check(this)">
                         <span class="help-block"></span>
                     </div>
             </div>
@@ -37,16 +46,16 @@
                         <label for="files" class=" form-control-label">Picture</label>
                     </div>
                     <div class="col-12 col-md-9">
-                        <input id="files" type="file" class="form-control" name = "files"/>
+                        <input id="files" type="file" class="form-control" name = "files" onchange="change(this)"/>
                         <span class="help-block"></span>
                     </div>
             </div>
-            <div class="row form-group">
+            <div class="row form-group" hidden>
                 <div class="col col-md-3">
                     <label for="category" class=" form-control-label">Category</label>
                 </div>
                 <div class="col-12 col-md-9">
-                    <select class="form-control form-control-md" name="CategoryName" tabindex="-1" aria-hidden="true" id="Category">
+                    <select class="form-control form-control-md" name="CategoryName" tabindex="-1" aria-hidden="true" id="Category" hidden>
                             <%categorys.forEach(function(category,index){%>
                                 <%if(category.SortKey == product.CategoryName){%> 
                                     <option selected="selected" value="<%=category.SortKey%>"><%=category.SortKey%></option>
@@ -58,12 +67,15 @@
                 </div>
             </div>
             <div class="card-footer">
-                    <button type="submit" class="btn btn-primary btn-sm">
-                        <i class="fa fa-dot-circle-o"></i> Submit
-                    </button>
-                    <button type="reset" class="btn btn-danger btn-sm">
-                        <i class="fa fa-ban"></i> Reset
-                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="checkAll(this)" data-value="edit">
+                            <i class="fa fa-dot-circle-o"></i> Submit
+                        </button>
+                        <button type="submit" style="display: none;" id="btnSubmitAdd">
+
+                        </button>
+                    <a type="reset" class="btn btn-danger btn-sm" href="/admin/ProductManagement">
+                        <i class="fa fa-ban"></i> Cancel
+                    </a>
                 </div>
         </form>
     </div>     
