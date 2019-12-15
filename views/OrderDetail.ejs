@@ -77,12 +77,41 @@
 
     <div class="cart-table-area section-padding-100">
         <div class="container-fluid">
+            <div class="row cart-title mt-50">
+                <h2>Order Detail</h2>
+            </div>
             <div class="row">
-                <div class="col-12 col-lg-8">
-                    <div class="cart-title mt-50">
-                        <h2>Shopping Cart</h2>
-                    </div>
 
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label>Name : <%=order.DetailInfo.FirstName%></label>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label>Phone : <%=order.DetailInfo.Phone%></label>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label>Address : <%=order.DetailInfo.Address%></label>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label>Order Title : <%=order.Title%></label>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label>Total Price : <%=order.TotalPrice%></label>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label>Ship Money : <%=order.ShipMoney%></label>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label>Payment Method : <%=order.DetailInfo.PaymentMethod%></label>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label>Delivery Date : <%=order.DetailInfo.DeliveryDate%></label>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-12">
+                    <div class="cart-title mt-50">
+                        <h2>List Product</h2>
+                    </div>
                     <div class="cart-table clearfix">
                         <table class="table table-responsive">
                             <thead>
@@ -109,10 +138,8 @@
                                     <div class="qty-btn d-flex">
                                         <p>Qty</p>
                                         <div class="quantity">
-                                            <!--                                            <span class="qty-minus" onclick="var effect = document.getElementById('<%=p.ProductID%>'); var price = document.getElementById('price<%=p.ProductID%>'); var qty = effect.value; if( !isNaN( qty ) && qty > 1 ) {effect.value&#45;&#45;;  price.innerText = effect.value*parseInt(<%=p.Price%>)};xetTotal(); return false; "><i class="fa fa-minus" aria-hidden="true"></i></span>-->
                                             <input disabled type="number" class="qty-text sp" id="<%=p.ProductID%>" step="1" min="1" max="300" name="quantity" value="<%=p.Quantity%>">
-                                            <!--                                            <span class="qty-plus" onclick="var effect = document.getElementById('<%=p.ProductID%>'); var price = document.getElementById('price<%=p.ProductID%>'); var qty = effect.value; if( !isNaN( qty )) {effect.value++; price.innerText = effect.value*parseInt(<%=p.Price%>)};xetTotal();return false;"><i class="fa fa-plus" aria-hidden="true"></i></span>-->
-                                            <a class="del" id="<%=p.ProductID%>" href="#" style="font-weight: bolder;">X</a>
+
                                         </div>
                                     </div>
                                 </td>
@@ -122,21 +149,7 @@
                         </table>
                     </div>
                 </div>
-                <div class="col-12 col-lg-4">
-                    <div class="cart-summary">
-                        <h5>Cart Total</h5>
-                        <ul class="summary-table">
-                            <li><span>subtotal:</span> <span class="sub">$<%=total%></span></li>
-                            <li><span>delivery:</span> <span>Free</span></li>
-                            <li><span>total:</span> <span class="sub">$<%=total%></span></li>
-                        </ul>
-                        <div class="cart-btn mt-100">
-                            <%if(c.length!=0){%>
-                            <a href="/checkout" class="btn amado-btn w-100 check">Checkout</a>
-                            <%}%>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
@@ -186,7 +199,35 @@
                 </div>
             </div>
             <!-- Single Widget Area -->
-            <%include MenuFooter.ejs%>
+            <div class="col-12 col-lg-8">
+                <div class="single_widget_area">
+                    <!-- Footer Menu -->
+                    <div class="footer_menu">
+                        <nav class="navbar navbar-expand-lg justify-content-end">
+                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#footerNavContent" aria-controls="footerNavContent" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i></button>
+                            <div class="collapse navbar-collapse" id="footerNavContent">
+                                <ul class="navbar-nav ml-auto">
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="index.html">Home</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="shop.html">Shop</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="product-details.html">Product</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="cart.html">Cart</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="checkout.html">Checkout</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </footer>

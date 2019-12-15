@@ -54,7 +54,7 @@ module.exports.getOrderTotalPrice = (orderID) => {
     })
 }
 
-module.exports.completeOrder = (UserID, Varies,Title, ShipMoney, DetailInfo) => {
+module.exports.completeOrder = (UserID, Varies,Title, totalPrice, DetailInfo) => {
     return new Promise((resolve,reject) => {
         var params = {
             TableName: "Users",
@@ -62,18 +62,20 @@ module.exports.completeOrder = (UserID, Varies,Title, ShipMoney, DetailInfo) => 
                 "UserID": UserID,
                 "Varies": Varies
             },
-            UpdateExpression: "set #st =:s,#ti = :ti,#sh = :sh,#de = :de",
+            UpdateExpression: "set #st =:s,#ti = :ti,#sh = :sh,#de = :de,#tpr = :tt",
             ExpressionAttributeNames:{
                 "#st": "Status",
                 "#ti":"Title",
                 "#sh":"ShipMoney",
-                "#de":"DetailInfo"
+                "#de":"DetailInfo",
+                "#tpr":"TotalPrice"
             },
             ExpressionAttributeValues:{
-                ":s": "Completed",
+                ":s": "Waiting",
                 ":ti": Title,
-                ":sh":ShipMoney,
-                ":de" : DetailInfo
+                ":sh": "20000",
+                ":de" : DetailInfo,
+                ":tt": totalPrice
             },
             ReturnValues:"UPDATED_NEW"
         };
