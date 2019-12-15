@@ -26,22 +26,19 @@
                 <li><a href="/cart">Cart</a></li>
             <%}%>
             <% if(selected == 3) {%>
-                <li class="active"><a href="/OrderControl">Order Control</a></li>
+                <li class="active"><a href="/UserInfomation">User Infomation</a></li>
             <%}else {%>
-                <li><a href="/OrderControl">Order Control</a></li>
+                <li><a href="/UserInfomation">User Infomation</a></li>
             <%}%>
         </ul>
     </nav>
     <!-- Button Group -->
     <div class="amado-btn-group mt-30 mb-100">
-        <a href="/auth/login" class="btn amado-btn mb-15">Login</a>
-        <a href="/admin" class="btn amado-btn active">Admin</a>
+        <a id="loginbtn" href="/auth/login" class="btn amado-btn mb-15">Login</a>
     </div>
     <!-- Cart Menu -->
     <div class="cart-fav-search mb-100">
-          
-        <a href="/cart" class="cart-nav"><img src="/img/core-img/cart.png" alt=""> Cart </a>
-        <a href="#" class="fav-nav"><img src="/img/core-img/favorites.png" alt=""> Favourite</a>
+        
         <a href="#" class="search-nav"><img src="/img/core-img/search.png" alt=""> Search</a>
     </div>
     <!-- Social Button -->
@@ -51,4 +48,6 @@
         <a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a>
         <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
     </div>
+
+    <script src="js/cklogin.js"></script>
 </header>

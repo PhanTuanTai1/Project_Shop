@@ -10,7 +10,7 @@ var orderController = require('../controllers/OrderControl.Controller');
 var cartController = require('../controllers/cart.controllers');
 
 router.get('/', function (req, res) {
-    res.render('admin', {page: ""});
+    res.render('admin', { page: "" });
 });
 router.get('/CategoryManagement', function (req, res) {
     adminController.CategoryManagement(res);
@@ -66,23 +66,23 @@ router.get('/AnalyzeManagement', jsonParser, async function (req, res) {
     var lsAnalyze = [];
     //console.log(JSON.stringify(lsAnalyze, null, '\t'));
     //For 1 tìm các order thuộc user này
-    for (var a = 0;a<lsUser.length;a++){
-        lsAnalyze.push({"UserID":lsUser[a].UserID,"Name":lsUser[a].FirstName + " " + lsUser[a].LastName});
-        var lsOrderOfUser = linq(lsOrder).where(function (v) { if(lsUser[a].UserID==v.UserID) return v; }).run();
+    for (var a = 0; a < lsUser.length; a++) {
+        lsAnalyze.push({ "UserID": lsUser[a].UserID, "Name": lsUser[a].FirstName + " " + lsUser[a].LastName });
+        var lsOrderOfUser = linq(lsOrder).where(function (v) { if (lsUser[a].UserID == v.UserID) return v; }).run();
         lsAnalyze[a].Order = lsOrderOfUser.length;
         lsAnalyze[a].Product = 0;
         lsAnalyze[a].Price = 0;
         //For 2 tìm các OderDetail thuộc Order
-        for (var b = 0;b<lsOrderOfUser.length;b++){
-            var lsOderDetailOfUser = linq(lsOrderDetail).where(function (v) { if(lsOrderOfUser[b].Varies==v.OrderID) return v; }).run();
+        for (var b = 0; b < lsOrderOfUser.length; b++) {
+            var lsOderDetailOfUser = linq(lsOrderDetail).where(function (v) { if (lsOrderOfUser[b].Varies == v.OrderID) return v; }).run();
             lsOderDetailOfUser.forEach(function (item) {
                 lsAnalyze[a].Product += item.Quantity;
-                lsAnalyze[a].Price += item.Price*item.Quantity;
+                lsAnalyze[a].Price += item.Price * item.Quantity;
             })
         }
     }
     console.log(JSON.stringify(lsAnalyze, null, '\t'));
-    res.render('AnalyzeManagement', {page: "",ls : lsAnalyze});
+    res.render('AnalyzeManagement', { page: "", ls: lsAnalyze });
 });
 
 router.get('/AnalyzeManagementOrder', jsonParser, async function (req, res) {
@@ -102,7 +102,7 @@ router.get('/AnalyzeManagementOrder', jsonParser, async function (req, res) {
         }
         if (i == ls.length - 1) {
             console.log(JSON.stringify(ls, null, '\t'));
-            res.render('AnalyzeManagementOrder', {order: ls,uid:userID});
+            res.render('AnalyzeManagementOrder', { order: ls, uid: userID });
         }
     }
 });
@@ -120,20 +120,48 @@ router.get('/AnalyzeManagementDetail', jsonParser, async function (req, res) {
         cart[i].Price = price;
         let p = await cartController.getProduct(cart[i].ProductID);
         cart[i].ProductName = p.ProductName;
-        console.log(JSON.stringify(cart,null,'\t'));
+        console.log(JSON.stringify(cart, null, '\t'));
         total += price * cart[i].Quantity;
         if (i == cart.length - 1)
-            res.render('AnalyzeManagementDetail', {order: order, c: cart, total: total});
+            res.render('AnalyzeManagementDetail', { order: order, c: cart, total: total });
     }
 });
-router.get('/ListProductQuantity/',function(req,res){
-    adminController.ProductQuantityManagement(req,res);
+
+router.get('/ConfirmDetail', async function (req, res) {
+    var userID = req.query.uid;
+    var orderId = req.query.oid;
+    console.log(userID + "|" + orderId);
+    var order = await orderController.getOrder(userID, orderId);
+    var cusName = order.DetailInfo.FirstName;
+    var cusPhone = order.DetailInfo.Phone;
+    var cart = await cartController.getOrderDetailByOrderID(orderId);
+    for (var i = 0; i < cart.length; i++) {
+        let p = await cartController.getProduct(cart[i].ProductID);
+        cart[i].ProductName = p.ProductName;
+        cart[i].RemainQuatity = p.Quantity;
+        cart[i].Quantity = cart[i].Quantity;
+        if (i == cart.length - 1){
+            res.render('DetailOrderConfirm', {
+                cart: cart,
+                cusName: cusName,
+                cusPhone: cusPhone,
+                orderId:orderId
+            })
+        }
+            
+            
+    }
 });
-router.get('/ListProductQuantityAdmin/:category',function(req,res){
-    adminController.ListProductQuantityAdmin(req,res);
+
+
+router.get('/ListProductQuantity/', function (req, res) {
+    adminController.ProductQuantityManagement(req, res);
+});
+router.get('/ListProductQuantityAdmin/:category', function (req, res) {
+    adminController.ListProductQuantityAdmin(req, res);
 })
-router.post("/EditProductQuantity",function(req,res){
-    adminController.UpdateQuantity(req,res);
+router.post("/EditProductQuantity", function (req, res) {
+    adminController.UpdateQuantity(req, res);
 })
 
 module.exports = router;

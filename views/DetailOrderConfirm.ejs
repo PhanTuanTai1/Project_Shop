@@ -1,0 +1,42 @@
+
+<div class="row">
+    <div class="col-12 mb-3">
+        <strong><label>Order ID : </label></strong><label style="color: #4272d7;"> &nbsp<%=orderId%></label>
+    </div>
+    <div class="col-12 mb-3">
+        <strong><label>Customer Name : </label></strong><label> &nbsp<%=cusName%></label>
+    </div>
+    <div class="col-12 mb-3">
+        <strong><label>Phone Number : </label></strong><label> &nbsp<%=cusPhone%></label>
+    </div>
+</div>
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Remaining quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% cart.forEach(p => { %>
+            <tr>
+                <td class="cart_product_img">
+                    <a href="/product?id=<%=p.ProductID%>"><%=p.ProductID%></a>
+                </td>
+                <td>
+                    <%=p.ProductName%>
+                </td>
+                <td>
+                    <%=p.Quantity%>
+                </td>
+                <td>
+                    <%=p.RemainQuatity%>
+                </td>
+            </tr>
+            <%})%>
+        </tbody>
+    </table>
+</div>

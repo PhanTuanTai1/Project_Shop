@@ -51,21 +51,6 @@ module.exports.getAllCategory = (req,res) => {
                 reject();
             } else {
                 console.log("Query succeeded.");
-                //Viet them code kiem tra order
-                var quantity = 0;
-                try {
-                    var userID = req.signedCookies.userID;
-                    var isValid = await cartController.checkUserIDValid(userID);
-                    if (isValid) {
-                        quantity = await cartController.getQuantityByIdCart(userID);
-                    } else {
-                        var cart = JSON.parse(req.cookies.cart);
-                        quantity = await cartController.getQuantityByCookie(cart);
-                    }
-                }catch (e) {
-                    quantity = 0;
-                }
-                //Viet them code kiem tra order
 
                 res.render('shop', {
                     selected: 1,
@@ -74,8 +59,7 @@ module.exports.getAllCategory = (req,res) => {
                     brand: data.Items,
                     objLast: data.LastEvaluatedKey,
                     QProduct: data.Items.length,
-                    limit: 6,
-                    quan:quantity
+                    limit: 6
                 });
             }
         });
